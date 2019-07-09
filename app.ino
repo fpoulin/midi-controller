@@ -1,11 +1,13 @@
 #define ARDUINO 1000
-#include <MIDI.h>
+// #include <MIDI.h>
 #include <LedControl.h>
+#include <binary.h>
 
-LedControl lc1 = LedControl(8, 6, 7, 4);
-LedControl lc2 = LedControl(11, 9, 10, 4);
+// init dot matrix display
+LedControl dmt1 = LedControl(11, 9, 10, 4);
+LedControl dmt2 = LedControl(8, 6, 7, 4);
 
-MIDI_CREATE_INSTANCE(HardwareSerial, Serial, MIDI);
+/* MIDI_CREATE_INSTANCE(HardwareSerial, Serial, MIDI);
 
 bool playing = false;
 int ticks = 0;
@@ -43,37 +45,38 @@ void doTheThing()
   int note = count++ % 16 + 36;
   MIDI.sendNoteOn(note, 127, 1);
   MIDI.sendNoteOn(note - 1, 0, 1);
-}
+} */
 
 void setup()
 {
   Serial.begin(9600);
 
-  pinMode(A1, INPUT);
-  pinMode(A2, INPUT);
-  pinMode(A3, INPUT);
-  pinMode(A4, INPUT);
-  pinMode(A5, INPUT);
-
-  pinMode(PIN2, INPUT_PULLUP);
-  pinMode(PIN3, INPUT_PULLUP);
-  pinMode(PIN4, INPUT_PULLUP);
-
-  for (int address = 0; address < lc1.getDeviceCount(); address++)
+  // init screen
+  for (int address = 0; address < dmt1.getDeviceCount(); address++)
   {
-    lc1.shutdown(address, false);
-    lc1.setIntensity(address, 8);
-    lc1.clearDisplay(address);
+    dmt1.shutdown(address, false);
+    dmt1.setIntensity(address, 0);
+    dmt1.clearDisplay(address);
   }
 
-  for (int address = 0; address < lc2.getDeviceCount(); address++)
+  for (int address = 0; address < dmt2.getDeviceCount(); address++)
   {
-    lc2.shutdown(address, false);
-    lc2.setIntensity(address, 8);
-    lc2.clearDisplay(address);
+    dmt2.shutdown(address, false);
+    dmt2.setIntensity(address, 0);
+    dmt2.clearDisplay(address);
   }
 
   /*
+  pinMode(A1, INPUT); // linear
+  pinMode(A2, INPUT); // knob 4
+  pinMode(A3, INPUT); // knob 3
+  pinMode(A4, INPUT); // knob 2
+  pinMode(A5, INPUT); // knob 1
+
+  pinMode(PIN2, INPUT_PULLUP); // push 1
+  pinMode(PIN3, INPUT_PULLUP); // push 2
+  pinMode(PIN4, INPUT_PULLUP); // push 3
+
   MIDI.begin(MIDI_CHANNEL_OMNI); // Listen to all incoming messages
   MIDI.turnThruOff();
   MIDI.setHandleClock(handleClock);
@@ -83,44 +86,50 @@ void setup()
    */
 }
 
+// the current step
+int step = 0;
+
+unsigned char trigs[8] = {
+    r(0b00000000),
+    r(0b01100110),
+    r(0b01100110),
+    r(0b00000000),
+    r(0b00011000),
+    r(0b00011000),
+    r(0b01000010),
+    r(0b00111100)
+  };
+
 void loop()
 {
   // MIDI.read();
 
-  //read the number cascaded devices
-  int devices = lc1.getDeviceCount();
+  LedControl dmt = step < 32 ? dmt1 : dmt2;
+  int bar = step % 32 / 8;
+  int col = step % 8;
 
-  int count = 0;
-  for (int i = 0; i < devices; i++)
+  for (int row = 0; row < 8; row++)
   {
-    int deviceNb = i;
-    for (int j = 0; j < 8; j++)
-    {
-      int col = 7 - j;
-      double radFactor = 3.1415926535 / 180;
-      int row = floor((sin(radFactor * (i * 8 + 7 - col) / 32.0 * 360) + 1) / 2 * 7.99);
-
-      lc1.setLed(deviceNb, row, col, true);
-      lc2.setLed(deviceNb, row, col, true);
-
-      int val = analogRead(A5);
-      Serial.print(val);
-      Serial.print(" - ");
-      val = map(val, 185, 1023, 5, 100);
-      Serial.println(val);
-
-      if (digitalRead(PIN2) == HIGH)
-      {
-        val = val / 10;
-      }
-      else
-      {
-        val = val * 10;
-      }
-
-      delay(val);
-      lc1.setLed(deviceNb, row, col, false);
-      lc2.setLed(deviceNb, row, col, false);
-    }
+    byte leds = trigs[7-row]; // swap row vertically ...
+    leds = leds | 0x1 << col;
+    dmt.setRow(bar, row, leds);
   }
+
+  // for now, just wait and then move to next step
+  delay(50);
+  step = ++step % 64;
+
+  // clear the module
+  for (int row = 0; row < 8; row++)
+  {
+    dmt.setRow(bar, row, 0);
+  }
+}
+
+// swap col horizontally...
+unsigned char r(unsigned char b) {
+   b = (b & 0xF0) >> 4 | (b & 0x0F) << 4;
+   b = (b & 0xCC) >> 2 | (b & 0x33) << 2;
+   b = (b & 0xAA) >> 1 | (b & 0x55) << 1;
+   return b;
 }
