@@ -1,11 +1,7 @@
 #define ARDUINO 1000
-// #include <MIDI.h>
-#include <LedControl.h>
-#include <binary.h>
+#include "Screen.h"
 
-// init dot matrix display
-LedControl dmt1 = LedControl(11, 9, 10, 4);
-LedControl dmt2 = LedControl(8, 6, 7, 4);
+Screen screen;
 
 /* MIDI_CREATE_INSTANCE(HardwareSerial, Serial, MIDI);
 
@@ -51,21 +47,6 @@ void setup()
 {
   Serial.begin(9600);
 
-  // init screen
-  for (int address = 0; address < dmt1.getDeviceCount(); address++)
-  {
-    dmt1.shutdown(address, false);
-    dmt1.setIntensity(address, 0);
-    dmt1.clearDisplay(address);
-  }
-
-  for (int address = 0; address < dmt2.getDeviceCount(); address++)
-  {
-    dmt2.shutdown(address, false);
-    dmt2.setIntensity(address, 0);
-    dmt2.clearDisplay(address);
-  }
-
   /*
   pinMode(A1, INPUT); // linear
   pinMode(A2, INPUT); // knob 4
@@ -89,47 +70,15 @@ void setup()
 // the current step
 int step = 0;
 
-unsigned char trigs[8] = {
-    r(0b00000000),
-    r(0b01100110),
-    r(0b01100110),
-    r(0b00000000),
-    r(0b00011000),
-    r(0b00011000),
-    r(0b01000010),
-    r(0b00111100)
-  };
-
 void loop()
 {
   // MIDI.read();
 
-  LedControl dmt = step < 32 ? dmt1 : dmt2;
-  int bar = step % 32 / 8;
-  int col = step % 8;
+  screen.display(step);
+  int oldStep = step;
 
-  for (int row = 0; row < 8; row++)
-  {
-    byte leds = trigs[7-row]; // swap row vertically ...
-    leds = leds | 0x1 << col;
-    dmt.setRow(bar, row, leds);
-  }
-
-  // for now, just wait and then move to next step
   delay(50);
   step = ++step % 64;
 
-  // clear the module
-  for (int row = 0; row < 8; row++)
-  {
-    dmt.setRow(bar, row, 0);
-  }
-}
-
-// swap col horizontally...
-unsigned char r(unsigned char b) {
-   b = (b & 0xF0) >> 4 | (b & 0x0F) << 4;
-   b = (b & 0xCC) >> 2 | (b & 0x33) << 2;
-   b = (b & 0xAA) >> 1 | (b & 0x55) << 1;
-   return b;
+  screen.clear(oldStep);
 }
