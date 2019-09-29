@@ -1,9 +1,6 @@
 #ifndef Screen_h
 #define Screen_h
 
-#define ARDUINO 1000
-#include "LedControl.h"
-
 class Screen {
     public:
         Screen();

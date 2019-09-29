@@ -1,5 +1,4 @@
-#define ARDUINO 1000
-#include "LedControl.h"
+#include <LedControl.h>
 #include "Screen.h"
 
 LedControl dmt1 = LedControl(11, 9, 10, 4);
