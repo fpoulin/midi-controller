@@ -1,8 +1,15 @@
 #define ARDUINO 1000
 #include "Screen.h"
-#include "MyMidi.h"
+#include "MidiIo.h"
+#include "State.h"
 
 Screen screen;
+State state;
+
+void playStep (const int& step, void (*sendNote)(const byte& note));
+
+// the current step
+int step = 0;
 
 void setup()
 {
@@ -16,21 +23,23 @@ void setup()
     pinMode(PIN3, INPUT_PULLUP); // push 2
     pinMode(PIN4, INPUT_PULLUP); // push 3
 
-    setupMidi();
+    midiIo::init(playStep);
 }
-
-// the current step
-int step = 0;
 
 void loop()
 {
-    loopMidi();
+    midiIo::loop();
 
-    screen.display(step);
-    int oldStep = step;
+    // screen.display(step);
+    // int oldStep = step;
+    // delay(20);
+    // step = ++step % 64;
+    // state.setState(step);
+    // screen.clear(oldStep);
+}
 
-    delay(20);
-    step = ++step % 64;
-
-    screen.clear(oldStep);
+void playStep (const int& step, void (*sendNote)(const byte& note)) {
+    int rand = step + random(2);
+    byte note = rand % 16 + 36;
+    sendNote(note);
 }
