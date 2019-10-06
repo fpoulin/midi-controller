@@ -4,8 +4,10 @@
 class State
 {
     public:
-        void setState(int state);
-        int getState();
+        State();
+        void setStep(int step);
+        int getStep();
+        unsigned char getNote();
 };
 
 #endif // State.h

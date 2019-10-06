@@ -5,11 +5,9 @@
 
 Screen screen;
 State state;
+int _lastStep = 0;
 
-void playStep (const int& step, void (*sendNote)(const byte& note));
-
-// the current step
-int step = 0;
+void playStep(const int &step, void (*sendNote)(const byte &note));
 
 void setup()
 {
@@ -29,17 +27,20 @@ void setup()
 void loop()
 {
     midiIo::loop();
-
-    // screen.display(step);
-    // int oldStep = step;
-    // delay(20);
-    // step = ++step % 64;
-    // state.setState(step);
-    // screen.clear(oldStep);
 }
 
-void playStep (const int& step, void (*sendNote)(const byte& note)) {
-    int rand = step + random(2);
-    byte note = rand % 16 + 36;
-    sendNote(note);
+void playStep(const int &step, void (*sendNote)(const byte &note))
+{
+    state.setStep(step);
+
+    // play note
+    if (step % 2 == 0 || rand() % 4 == 0)
+    {
+        sendNote(state.getNote());
+    }
+
+    // dmt
+    screen.clear(_lastStep);
+    screen.display(step);
+    _lastStep = step;
 }

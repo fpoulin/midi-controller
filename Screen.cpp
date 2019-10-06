@@ -35,6 +35,8 @@ Screen::Screen()
 
 void Screen::display(int step)
 {
+    step = step % 64;
+
     LedControl dmt = step < 32 ? dmt1 : dmt2;
     int bar = step % 32 / 8;
     int col = step % 8;
@@ -49,6 +51,8 @@ void Screen::display(int step)
 
 void Screen::clear(int step)
 {
+    step = step % 64;
+
     LedControl dmt = step < 32 ? dmt1 : dmt2;
     int bar = step % 32 / 8;
 
