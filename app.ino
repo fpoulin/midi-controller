@@ -3,8 +3,8 @@
 #include "MidiIo.h"
 #include "State.h"
 
-Screen screen;
-State state;
+ui::Screen screen;
+core::State state;
 int _lastStep = 0;
 
 void playStep(const int &step, void (*sendNote)(const byte &note));
@@ -12,6 +12,7 @@ void playStep(const int &step, void (*sendNote)(const byte &note));
 void setup()
 {
     pinMode(A1, INPUT); // linear
+
     pinMode(A2, INPUT); // knob 4
     pinMode(A3, INPUT); // knob 3
     pinMode(A4, INPUT); // knob 2
@@ -34,7 +35,7 @@ void playStep(const int &step, void (*sendNote)(const byte &note))
     state.setStep(step);
 
     // play note
-    if (step % 2 == 0 || rand() % 4 == 0)
+    if (state.hasNote())
     {
         sendNote(state.getNote());
     }

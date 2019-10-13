@@ -1,0 +1,12 @@
+#pragma once
+
+#define UTILS_NAMESPACE utilities
+#define BEGIN_UTILS_NAMESPACE \
+    namespace UTILS_NAMESPACE \
+    {
+#define END_UTILS_NAMESPACE }
+
+BEGIN_UTILS_NAMESPACE
+
+
+END_UTILS_NAMESPACE

@@ -1,29 +1,39 @@
 #include "State.h"
 #include <arduino.h>
 
-int _step = 0;
-
-unsigned char notes[4];
-unsigned char shift = 0;
+BEGIN_STATE_NAMESPACE
 
 State::State() {
-    notes[0] = 36;
-    notes[1] = 39;
-    notes[2] = 41;
-    notes[3] = 43;
+
+    _currNote = 0;
+
+    trigs[0] = 138;
+    trigs[1] = 40;
+    trigs[2] = 162;
+    trigs[3] = 138;
+    trigs[4] = 138;
+    trigs[5] = 40;
+    trigs[6] = 162;
+    trigs[7] = 138;
+
+    notes[0] = 36 + 12;
+    notes[1] = 39 + 12;
+    notes[2] = 41 + 12;
+    notes[3] = 43 + 12;
 }
 
 void State::setStep(int step) {
-    _step = step;
-    if(step % 32 == 0) {
-        shift = rand() % 10;
-    }
+    _currBeat = (step / 8) % 8;
+    _currTrig = 128 >> step % 8 ;
+    _currNote = _currBeat == 0 && _currTrig == 0 ? 0 : _currNote;
 }
 
-int State::getStep() {
-    return _step;
+bool State::hasNote() {
+    return trigs[_currBeat] & _currTrig;
 }
 
 unsigned char State::getNote() {
-    return notes[_step % 4] + shift;
+    return notes[_currNote++ % 4];
 }
+
+END_STATE_NAMESPACE

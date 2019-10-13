@@ -1,6 +1,8 @@
 #include <LedControl.h>
 #include "Screen.h"
 
+BEGIN_SCREEN_NAMESPACE
+
 LedControl dmt1 = LedControl(11, 9, 10, 4);
 LedControl dmt2 = LedControl(8, 6, 7, 4);
 
@@ -71,3 +73,5 @@ unsigned char Screen::r(unsigned char b)
     b = (b & 0xAA) >> 1 | (b & 0x55) << 1;
     return b;
 }
+
+END_SCREEN_NAMESPACE

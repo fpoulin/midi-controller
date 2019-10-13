@@ -9,7 +9,7 @@ void handleClock(void);
 void handleStart(void);
 void handleContinue(void);
 void handleStop(void);
-void sendNote(const byte& note);
+void sendNote(const byte &note);
 
 #ifndef DEBUG_SERIAL
 MIDI_CREATE_INSTANCE(HardwareSerial, Serial, MIDI);
@@ -20,9 +20,9 @@ unsigned long _ticks = 0;
 int _count = 0;
 byte lastNote;
 
-void (*_onStep)(const int& step, void (*sendNote)(const byte& note));
+void (*_onStep)(const int &step, void (*sendNote)(const byte &note));
 
-void init(void (*onStep)(const int& step, void (*sendNote)(const byte& note)))
+void init(void (*onStep)(const int &step, void (*sendNote)(const byte &note)))
 {
     _onStep = onStep;
 
@@ -48,7 +48,8 @@ void doTheThing()
     _count++;
 }
 
-void sendNote(const byte& note) {
+void sendNote(const byte &note)
+{
 
 #ifdef DEBUG_SERIAL
     Serial.print("Note off: ");
@@ -57,7 +58,7 @@ void sendNote(const byte& note) {
     Serial.println(note);
     Serial.flush();
 #else
-    
+
     MIDI.sendNoteOn(lastNote, 0, 1);
     MIDI.sendNoteOn(note, 127, 1);
 #endif

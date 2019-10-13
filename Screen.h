@@ -1,13 +1,21 @@
-#ifndef Screen_h
-#define Screen_h
+#pragma once
 
-class Screen {
-    public:
-        Screen();
-        void display(int step);
-        void clear(int step);
-    private:
-        unsigned char r(unsigned char b);
+#define BEGIN_SCREEN_NAMESPACE \
+    namespace ui               \
+    {
+#define END_SCREEN_NAMESPACE }
+
+BEGIN_SCREEN_NAMESPACE
+
+class Screen
+{
+public:
+    Screen();
+    void display(int step);
+    void clear(int step);
+
+private:
+    unsigned char r(unsigned char b);
 };
 
-#endif // Screen.h
+END_SCREEN_NAMESPACE
