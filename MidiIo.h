@@ -10,7 +10,7 @@ BEGIN_MIDI_IO_NAMESPACE
 
 void init(
     void (*onStep)(int step, void (*sendNote)(byte note)),
-    void (*onNote)(byte note),
+    void (*onNote)(byte* chord),
     void (*onStop)(void));
 
 void loop();

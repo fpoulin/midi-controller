@@ -7,7 +7,7 @@ Screen screen;
 State state;
 
 void playStep(int step, void (*sendNote)(byte note));
-void addNote(byte note);
+void addChord(byte* chord);
 void stop();
 
 void setup()
@@ -23,7 +23,7 @@ void setup()
     pinMode(PIN3, INPUT_PULLUP); // push 2
     pinMode(PIN4, INPUT_PULLUP); // push 3
 
-    midiIo::init(playStep, addNote, stop);
+    midiIo::init(playStep, addChord, stop);
 }
 
 void loop()
@@ -42,9 +42,9 @@ void playStep(int step, void (*sendNote)(byte note))
     }
 }
 
-void addNote(byte note)
+void addChord(byte* chord)
 {
-    state.addNote(note);
+    state.addChord(chord);
 }
 
 void stop()

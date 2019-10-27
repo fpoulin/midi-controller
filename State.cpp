@@ -4,33 +4,37 @@
 State::State()
 {
     this->_currNote = 0;
-    this->_currNoteId = 0;
+    this->_currChord = 0;
+    this->_currChordInputId = 0;
 
-    this->_trigs[0] = 136;
-    this->_trigs[1] = 136;
-    this->_trigs[2] = 136;
-    this->_trigs[3] = 136;
-    this->_trigs[4] = 136;
-    this->_trigs[5] = 136;
-    this->_trigs[6] = 136;
-    this->_trigs[7] = 136;
+    this->_trigs[0] = 170; // 10101010
+    this->_trigs[1] = 170;
+    this->_trigs[2] = 170;
+    this->_trigs[3] = 170;
 
-    this->_notes[0] = 36 + 12;
-    this->_notes[1] = 39 + 12;
-    this->_notes[2] = 41 + 12;
-    this->_notes[3] = 43 + 12;
+    for (int i = 0; i < 4; i++)
+    {
+        this->_chords[i][0] = 36 + i * 12;
+        this->_chords[i][1] = 39 + i * 12;
+        this->_chords[i][2] = 41 + i * 12;
+        this->_chords[i][3] = 43 + i * 12;
+    }
 }
 
-void State::addNote(unsigned char note)
+void State::addChord(unsigned char *chord)
 {
-    this->_notes[this->_currNoteId++ % 4] = note;
+    this-> _currChordInputId = this-> _currChordInputId++ % 4;
+    for (int i = 0; i < 4; i++)
+    {
+        this->_chords[_currChordInputId][i] = chord[i];
+    }
 }
 
 void State::moveToStep(int step)
 {
-    this->_currBeat = (step / 8) % 8;
     this->_currTrig = 128 >> step % 8;
-    this->_currNote = this->_currBeat == 0 && this->_currTrig == 0 ? 0 : this->_currNote;
+    this->_currBeat = (step / 4) % 4;
+    this->_currChord = (step / 32) % 4; // switch chord every 2 bars
 }
 
 bool State::hasNote()
@@ -40,12 +44,14 @@ bool State::hasNote()
 
 unsigned char State::getNote()
 {
-    return this->_notes[this->_currNote++ % 4];
+    return this->_chords[this->_currChord][this->_currNote++ % 4];
 }
 
-void State::reset() {
-    this->_currBeat = 0;
-    this->_currNote = 0;
-    this->_currNoteId = 0;
+void State::reset()
+{
     this->_currTrig = 0;
+    this->_currNote = 0;
+    this->_currBeat = 0;
+    this->_currChord = 0;
+    this->_currChordInputId = 0;
 }
