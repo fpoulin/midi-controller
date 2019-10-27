@@ -9,8 +9,8 @@ State::State()
 
     this->_trigs[0] = 170; // 10101010
     this->_trigs[1] = 170;
-    this->_trigs[2] = 170;
-    this->_trigs[3] = 170;
+    this->_trigs[2] = 221; // 11111111
+    this->_trigs[3] = 255;
 
     for (int i = 0; i < 4; i++)
     {
@@ -23,11 +23,11 @@ State::State()
 
 void State::addChord(unsigned char *chord)
 {
-    this-> _currChordInputId = this-> _currChordInputId++ % 4;
     for (int i = 0; i < 4; i++)
     {
         this->_chords[_currChordInputId][i] = chord[i];
     }
+    this->_currChordInputId = ++this->_currChordInputId % 4;
 }
 
 void State::moveToStep(int step)

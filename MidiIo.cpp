@@ -14,15 +14,19 @@ midi::MidiInterface<HardwareSerial> MIDI((HardwareSerial &)Serial);
 bool _playing = false;
 unsigned long _ticks = 0;
 int _step = 0;
-byte lastNote;
+uint8_t lastNote;
+
+uint8_t nbKeyPressed = 0;
+uint8_t chord[4];
+bool sendChord = false;
 
 void (*_onStep)(int step, void (*sendNote)(byte note));
-void (*_onChord)(byte* chord);
+void (*_onChord)(byte *chord);
 void (*_onStop)(void);
 
 void init(
     void (*onStep)(int step, void (*sendNote)(byte note)),
-    void (*onChord)(byte* chord),
+    void (*onChord)(byte *chord),
     void (*onStop)(void))
 {
     _onStep = onStep;
@@ -38,7 +42,7 @@ void init(
     MIDI.setHandleNoteOff(handleNoteOff);
 }
 
-void sendNote(const byte note)
+void sendNote(uint8_t note)
 {
     MIDI.sendNoteOn(lastNote, 0, 1);
     MIDI.sendNoteOn(note, 127, 1);
@@ -70,6 +74,8 @@ void handleStop()
     _playing = false;
     _ticks = 0;
     _step = 0;
+    nbKeyPressed = 0;
+    sendChord = false;
     _onStop();
 
     MIDI.sendNoteOn(lastNote, 0, 1);
@@ -77,12 +83,22 @@ void handleStop()
 
 void handleNoteOn(byte channel, byte note, byte velocity)
 {
-    /* do nothing for now -> collect 4 notes chord and send to _onChord */
+    if (nbKeyPressed < 4)
+    {
+        chord[nbKeyPressed++] = note;
+        if (nbKeyPressed == 4)
+        {
+            sendChord = true;
+        }
+    }
 }
 
 void handleNoteOff(byte channel, byte note, byte velocity)
 {
-    /* do nothing for now */
+    if (!--nbKeyPressed && sendChord)
+    {
+        _onChord(chord);
+    }
 }
 
 END_MIDI_IO_NAMESPACE
