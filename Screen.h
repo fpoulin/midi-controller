@@ -1,21 +1,20 @@
+#include <LedControl.h>
+
 #pragma once
-
-#define BEGIN_SCREEN_NAMESPACE \
-    namespace ui               \
-    {
-#define END_SCREEN_NAMESPACE }
-
-BEGIN_SCREEN_NAMESPACE
 
 class Screen
 {
+private:
+    LedControl _dmt1;
+    LedControl _dmt2;
+    unsigned char _trigs[8];
+    int _lastStep = 0;
+
 public:
     Screen();
-    void display(int step);
+    void moveCursor(int step);
     void clear(int step);
 
 private:
     unsigned char r(unsigned char b);
 };
-
-END_SCREEN_NAMESPACE

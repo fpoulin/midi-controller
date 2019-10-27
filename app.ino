@@ -3,9 +3,8 @@
 #include "MidiIo.h"
 #include "State.h"
 
-ui::Screen screen;
+Screen screen;
 State state;
-int _lastStep = 0;
 
 void playStep(int step, void (*sendNote)(byte note));
 void addNote(byte note);
@@ -34,18 +33,13 @@ void loop()
 
 void playStep(int step, void (*sendNote)(byte note))
 {
-    state.moveToStep(step);
+    screen.moveCursor(step);
 
-    // play note
+    state.moveToStep(step);
     if (state.hasNote())
     {
         sendNote(state.getNote());
     }
-
-    // dmt
-    screen.clear(_lastStep);
-    screen.display(step);
-    _lastStep = step;
 }
 
 void addNote(byte note)
@@ -55,5 +49,6 @@ void addNote(byte note)
 
 void stop()
 {
+    screen.moveCursor(0);
     state.reset();
 }

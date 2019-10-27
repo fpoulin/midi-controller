@@ -1,0 +1,80 @@
+//#define DEBUG_SERIAL 1
+
+#include <MIDI.h>
+#include "MidiIo.h"
+
+BEGIN_MIDI_IO_NAMESPACE
+
+void init(
+    void (*onStep)(int step, void (*sendNote)(byte note)),
+    void (*onNote)(byte note),
+    void (*onStop)(void))
+{
+    _onStep = onStep;
+    _onNote = onNote;
+    _onStop = onStop;
+
+    Serial.begin(9600);
+    Serial.println("Starting in debug ...");
+    Serial.flush();
+}
+
+void doTheThing()
+{
+    _onStep(_count, sendNote);
+    _count++;
+}
+
+void sendNote(const byte note)
+{
+    Serial.print("Note off: ");
+    Serial.print(lastNote);
+    Serial.print("  -- Note on: ");
+    Serial.println(note);
+    Serial.flush();
+
+    lastNote = note;
+}
+
+void loop()
+{
+    unsigned long t = millis();
+    if (t - _ticks > 1000)
+    {
+        _ticks = t;
+        doTheThing();
+    }
+}
+
+void handleClock(void)
+{
+    if (_playing && _ticks++ % 6 == 0)
+    {
+        doTheThing();
+    }
+}
+
+void handleStart(void)
+{
+    _playing = true;
+    _ticks = 0;
+    _count = 0;
+}
+
+void handleContinue(void)
+{
+    _playing = true;
+    _ticks = 0;
+}
+
+void handleStop(void)
+{
+    _playing = false;
+    _ticks = 0;
+    _onStop();
+
+    Serial.print("Note off: ");
+    Serial.print(lastNote);
+}
+
+END_MIDI_IO_NAMESPACE
