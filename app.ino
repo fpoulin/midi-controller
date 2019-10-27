@@ -4,7 +4,7 @@
 #include "State.h"
 
 ui::Screen screen;
-core::State state;
+State state;
 int _lastStep = 0;
 
 void playStep(const int &step, void (*sendNote)(const byte &note));

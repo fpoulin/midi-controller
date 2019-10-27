@@ -82,7 +82,7 @@ void loop()
 
 void handleClock(void)
 {
-    if (_playing && _ticks++ % 3 == 0)
+    if (_playing && _ticks++ % 6 == 0)
     {
         doTheThing();
     }
