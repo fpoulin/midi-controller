@@ -8,7 +8,11 @@
 
 BEGIN_MIDI_IO_NAMESPACE
 
-void init(void (*onStep)(const int& step, void (*sendNote)(const byte& note)));
+void init(
+    void (*onStep)(int step, void (*sendNote)(byte note)),
+    void (*onNote)(byte note),
+    void (*_onStop)(void));
+
 void loop();
 
 END_MIDI_IO_NAMESPACE

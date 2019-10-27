@@ -7,7 +7,9 @@ ui::Screen screen;
 State state;
 int _lastStep = 0;
 
-void playStep(const int &step, void (*sendNote)(const byte &note));
+void playStep(int step, void (*sendNote)(byte note));
+void addNote(byte note);
+void stop();
 
 void setup()
 {
@@ -22,7 +24,7 @@ void setup()
     pinMode(PIN3, INPUT_PULLUP); // push 2
     pinMode(PIN4, INPUT_PULLUP); // push 3
 
-    midiIo::init(playStep);
+    midiIo::init(playStep, addNote, stop);
 }
 
 void loop()
@@ -30,9 +32,9 @@ void loop()
     midiIo::loop();
 }
 
-void playStep(const int &step, void (*sendNote)(const byte &note))
+void playStep(int step, void (*sendNote)(byte note))
 {
-    state.setStep(step);
+    state.moveToStep(step);
 
     // play note
     if (state.hasNote())
@@ -44,4 +46,14 @@ void playStep(const int &step, void (*sendNote)(const byte &note))
     screen.clear(_lastStep);
     screen.display(step);
     _lastStep = step;
+}
+
+void addNote(byte note)
+{
+    state.addNote(note);
+}
+
+void stop()
+{
+    state.reset();
 }

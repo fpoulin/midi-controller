@@ -9,7 +9,9 @@ void handleClock(void);
 void handleStart(void);
 void handleContinue(void);
 void handleStop(void);
-void sendNote(const byte &note);
+void sendNote(const byte note);
+void handleNoteOn(byte channel, byte note, byte velocity);
+void handleNoteOff(byte channel, byte note, byte velocity);
 
 #ifndef DEBUG_SERIAL
 MIDI_CREATE_INSTANCE(HardwareSerial, Serial, MIDI);
@@ -20,11 +22,18 @@ unsigned long _ticks = 0;
 int _count = 0;
 byte lastNote;
 
-void (*_onStep)(const int &step, void (*sendNote)(const byte &note));
+void (*_onStep)(int step, void (*sendNote)(byte note));
+void (*_onNote)(byte note);
+void (*_onStop)(void);
 
-void init(void (*onStep)(const int &step, void (*sendNote)(const byte &note)))
+void init(
+    void (*onStep)(int step, void (*sendNote)(byte note)),
+    void (*onNote)(byte note),
+    void (*onStop)(void))
 {
     _onStep = onStep;
+    _onNote = onNote;
+    _onStop = onStop;
 
 #ifdef DEBUG_SERIAL
     Serial.begin(9600);
@@ -32,13 +41,14 @@ void init(void (*onStep)(const int &step, void (*sendNote)(const byte &note)))
     Serial.flush();
 #else
 
-    MIDI.begin();
+    MIDI.begin(MIDI_CHANNEL_OMNI);
     MIDI.turnThruOff();
-    Serial.flush();
     MIDI.setHandleClock(handleClock);
     MIDI.setHandleStart(handleStart);
     MIDI.setHandleContinue(handleContinue);
     MIDI.setHandleStop(handleStop);
+    MIDI.setHandleNoteOn(handleNoteOn);
+    MIDI.setHandleNoteOff(handleNoteOff);
 #endif
 }
 
@@ -48,7 +58,7 @@ void doTheThing()
     _count++;
 }
 
-void sendNote(const byte &note)
+void sendNote(const byte note)
 {
 
 #ifdef DEBUG_SERIAL
@@ -105,6 +115,7 @@ void handleStop(void)
 {
     _playing = false;
     _ticks = 0;
+    _onStop();
 
 #ifdef DEBUG_SERIAL
     Serial.print("Note off: ");
@@ -112,6 +123,16 @@ void handleStop(void)
 #else
     MIDI.sendNoteOn(lastNote, 0, 1);
 #endif
+}
+
+void handleNoteOn(byte channel, byte note, byte velocity)
+{
+    /* do nothing for now */
+}
+
+void handleNoteOff(byte channel, byte note, byte velocity)
+{
+    _onNote(note);
 }
 
 END_MIDI_IO_NAMESPACE
