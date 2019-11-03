@@ -1,5 +1,6 @@
 #include <LedControl.h>
 #include "Screen.h"
+#include "State.h"
 
 Screen::Screen() : _dmt1(LedControl(11, 9, 10, 4)), _dmt2(LedControl(8, 6, 7, 4))
 {
@@ -21,10 +22,15 @@ Screen::Screen() : _dmt1(LedControl(11, 9, 10, 4)), _dmt2(LedControl(8, 6, 7, 4)
     }
 }
 
+void Screen::init(State &state)
+{
+    
+}
+
 void Screen::moveCursor(int step)
 {
     clear(this->_lastStep);
-    
+
     step = step % 64;
 
     LedControl dmt = step < 32 ? this->_dmt1 : this->_dmt2;

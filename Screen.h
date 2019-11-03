@@ -12,6 +12,7 @@ private:
 
 public:
     Screen();
+    void init(State &state);
     void moveCursor(int step);
     void clear(int step);
 

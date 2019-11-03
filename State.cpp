@@ -21,7 +21,7 @@ State::State()
     }
 }
 
-void State::addChord(unsigned char *chord)
+void State::addChord(uint8_t *chord)
 {
     for (int i = 0; i < 4; i++)
     {
@@ -42,7 +42,7 @@ bool State::hasNote()
     return this->_trigs[this->_currBeat] & this->_currTrig;
 }
 
-unsigned char State::getNote()
+uint8_t State::getNote()
 {
     return this->_chords[this->_currChord][this->_currNote++ % 4];
 }
