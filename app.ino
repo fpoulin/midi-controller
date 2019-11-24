@@ -6,8 +6,8 @@
 Screen screen;
 State state;
 
-void playStep(int step, void (*sendNote)(byte note));
-void addChord(byte* chord);
+void playStep(int step, void (*sendNote)(uint8_t channel, uint8_t *notes));
+void addChord(uint8_t *chord);
 void stop();
 
 void setup()
@@ -31,18 +31,21 @@ void loop()
     midiIo::loop();
 }
 
-void playStep(int step, void (*sendNote)(byte note))
+void playStep(int step, void (*sendNote)(uint8_t channel, uint8_t *notes))
 {
     screen.moveCursor(step);
-
     state.moveToStep(step);
-    if (state.hasNote())
+
+    for (uint8_t channel = 0; channel < 2; channel++)
     {
-        sendNote(state.getNote());
+        if (state.hasTrigOn(channel) != 0)
+        {
+            sendNote(channel, state.getNotes(channel));
+        }
     }
 }
 
-void addChord(byte* chord)
+void addChord(uint8_t *chord)
 {
     state.addChord(chord);
 }
