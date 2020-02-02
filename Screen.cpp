@@ -1,15 +1,75 @@
 #include <LedControl.h>
 #include "Screen.h"
-#include "State.h"
 
 Screen::Screen() : _dmt1(LedControl(11, 9, 10, 4)), _dmt2(LedControl(8, 6, 7, 4))
 {
-    for (byte i = 0; i < 8; i++)
+    clear();
+}
+
+void Screen::setPixel(uint8_t x, uint8_t y, boolean state)
+{
+    if (x < 0 || x > 31 || y < 0 || y > 15)
     {
-        this->_trigs[i] = 0;
+        return;
     }
 
-    // init screen
+    // pick the right dmt
+    uint8_t &row = y < 8
+        ? this->_dmt1RowsNext[y][x / 8]
+        : this->_dmt2RowsNext[y % 8][x / 8];
+
+    // x=18 -> bitmap = 01000000 (swapped)
+    this->_bitmap = 0x01 << (x % 8);
+    if (state)
+    {
+        // add bit (row OR 01000000)
+        row |= _bitmap;
+    }
+    else
+    {
+        // clear the bit (row AND 10111111)
+        row &= ~_bitmap;
+    }
+}
+
+void Screen::repaint()
+{
+    // find and apply changes selectively (bitwise diff, work per row)
+    for (uint8_t i = 0; i < 8; i++)
+    {
+        for (uint8_t j = 0; j < 4; j++)
+        {
+            this->_bitmap = this->_dmt1RowsCur[i][j] ^ this->_dmt1RowsNext[i][j];
+            if (this->_bitmap != 0)
+            {
+                this->_dmt1.setRow(j, 7 - i, this->_dmt1RowsNext[i][j]);
+                this->_dmt1RowsCur[i][j] = this->_dmt1RowsNext[i][j];
+            }
+
+            this->_bitmap = this->_dmt2RowsCur[i][j] ^ this->_dmt2RowsNext[i][j];
+            if (this->_bitmap != 0)
+            {
+                this->_dmt2.setRow(j, 7 - i, this->_dmt2RowsNext[i][j]);
+                this->_dmt2RowsCur[i][j] = this->_dmt2RowsNext[i][j];
+            }
+        }
+    }
+}
+
+void Screen::clear()
+{
+    for (uint8_t i = 0; i < 8; i++)
+    {
+        for (uint8_t j = 0; j < 4; j++)
+        {
+            this->_dmt1RowsCur[i][j] = 0;
+            this->_dmt1RowsNext[i][j] = 0;
+            this->_dmt2RowsCur[i][j] = 0;
+            this->_dmt2RowsNext[i][j] = 0;
+        }
+    }
+
+    // re-init screen
     for (int address = 0; address < 4; address++)
     {
         this->_dmt1.shutdown(address, false);
@@ -20,52 +80,4 @@ Screen::Screen() : _dmt1(LedControl(11, 9, 10, 4)), _dmt2(LedControl(8, 6, 7, 4)
         this->_dmt2.setIntensity(address, 0);
         this->_dmt2.clearDisplay(address);
     }
-}
-
-void Screen::init(State &state)
-{
-    
-}
-
-void Screen::moveCursor(int step)
-{
-    clear(this->_lastStep);
-
-    step = step % 64;
-
-    LedControl dmt = step < 32 ? this->_dmt1 : this->_dmt2;
-    int bar = step % 32 / 8;
-    int col = step % 8;
-
-    for (int row = 0; row < 8; row++)
-    {
-        byte leds = this->_trigs[7 - row]; // swap row vertically ...
-        leds = leds | 0x1 << col;
-        dmt.setRow(bar, row, leds);
-    }
-
-    this->_lastStep = step;
-}
-
-void Screen::clear(int step)
-{
-    step = step % 64;
-
-    LedControl dmt = step < 32 ? this->_dmt1 : this->_dmt2;
-    int bar = step % 32 / 8;
-
-    // clear the module
-    for (int row = 0; row < 8; row++)
-    {
-        dmt.setRow(bar, row, 0);
-    }
-}
-
-// swap col horizontally...
-unsigned char Screen::r(unsigned char b)
-{
-    b = (b & 0xF0) >> 4 | (b & 0x0F) << 4;
-    b = (b & 0xCC) >> 2 | (b & 0x33) << 2;
-    b = (b & 0xAA) >> 1 | (b & 0x55) << 1;
-    return b;
 }

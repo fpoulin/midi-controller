@@ -1,12 +1,12 @@
 #define ARDUINO 1000
-#include "Screen.h"
+#include "Gui.h"
 #include "MidiIo.h"
 #include "State.h"
 
-Screen screen;
-State state;
+State _state;
+Gui _gui(_state);
 
-void playStep(int step, void (*sendNote)(uint8_t channel, uint8_t *notes));
+void playStep(uint8_t step, void (*sendNote)(uint8_t channel, uint8_t *notes));
 void addChord(uint8_t *chord);
 void stop();
 
@@ -31,27 +31,27 @@ void loop()
     midiIo::loop();
 }
 
-void playStep(int step, void (*sendNote)(uint8_t channel, uint8_t *notes))
+void playStep(uint8_t step, void (*sendNote)(uint8_t channel, uint8_t *notes))
 {
-    screen.moveCursor(step);
-    state.moveToStep(step);
+    _state.moveToStep(step);
+    _gui.moveToStep(step);
 
     for (uint8_t channel = 0; channel < 2; channel++)
     {
-        if (state.hasTrigOn(channel) != 0)
+        if (_state.hasTrigOn(channel) != 0)
         {
-            sendNote(channel, state.getNotes(channel));
+            sendNote(channel, _state.getNotes(channel));
         }
     }
 }
 
 void addChord(uint8_t *chord)
 {
-    state.addChord(chord);
+    _state.addChord(chord);
 }
 
 void stop()
 {
-    screen.moveCursor(0);
-    state.reset();
+    _state.reset();
+    _gui.reset();
 }

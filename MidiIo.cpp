@@ -12,21 +12,21 @@ void reset();
 
 midi::MidiInterface<HardwareSerial> MIDI((HardwareSerial &)Serial);
 
-bool _playing = false;
-unsigned long _ticks = 0;
-int _step = 0;
-uint8_t lastNotes[2][4]; // [channel][note]
+boolean _playing = false;
+uint8_t _clock = 0;
+uint8_t _step = 0;
+uint8_t _lastNotes[2][4]; // [channel][note]
 
-uint8_t nbKeyPressed = 0;
-uint8_t chord[4];
-bool sendChord = false;
+uint8_t _nbKeyPressed = 0;
+uint8_t _chord[4];
+boolean _sendChord = false;
 
-void (*_onStep)(int step, void (*sendNote)(uint8_t channel, uint8_t *notes));
+void (*_onStep)(uint8_t step, void (*sendNote)(uint8_t channel, uint8_t *notes));
 void (*_onChord)(uint8_t *chord);
 void (*_onStop)(void);
 
 void init(
-    void (*onStep)(int step, void (*sendNote)(uint8_t channel, uint8_t *notes)),
+    void (*onStep)(uint8_t step, void (*sendNote)(uint8_t channel, uint8_t *notes)),
     void (*onChord)(uint8_t *chord),
     void (*onStop)(void))
 {
@@ -49,12 +49,12 @@ void sendNotes(uint8_t channel, uint8_t *notes)
 {
     for (uint8_t i = 0; i < 4; i++)
     {
-        if (lastNotes[channel][i] != 0)
+        if (_lastNotes[channel][i] != 0)
         {
-            MIDI.sendNoteOn(lastNotes[channel][i], 0, channel + 1);
+            MIDI.sendNoteOn(_lastNotes[channel][i], 0, channel + 1);
         }
 
-        lastNotes[channel][i] = notes[i];
+        _lastNotes[channel][i] = notes[i];
         if (notes[i] != 0)
         {
             MIDI.sendNoteOn(notes[i], 127, channel + 1);
@@ -69,10 +69,11 @@ void loop()
 
 void handleClock()
 {
-    if (_playing && _ticks++ % 6 == 0)
+    _clock = _clock % 6;
+    if (_playing && _clock++ == 0)
     {
         _onStep(_step, sendNotes);
-        _step++;
+        _step++; // let it overflow (255 -> 0)
     }
 }
 
@@ -89,9 +90,9 @@ void handleStop()
     {
         for (uint8_t i = 0; i < 4; i++)
         {
-            if (lastNotes[channel][i] != 0)
+            if (_lastNotes[channel][i] != 0)
             {
-                MIDI.sendNoteOn(lastNotes[channel][i], 0, channel+1);
+                MIDI.sendNoteOn(_lastNotes[channel][i], 0, channel+1);
             }
         }
     }
@@ -101,37 +102,38 @@ void handleStop()
 
 void handleNoteOn(byte channel, byte note, byte velocity)
 {
-    if (nbKeyPressed < 4)
+    if (_nbKeyPressed < 4)
     {
-        chord[nbKeyPressed++] = note;
-        if (nbKeyPressed == 4)
+        _chord[_nbKeyPressed++] = note;
+        if (_nbKeyPressed == 4)
         {
-            sendChord = true;
+            _sendChord = true;
         }
     }
 }
 
 void handleNoteOff(byte channel, byte note, byte velocity)
 {
-    if (!--nbKeyPressed && sendChord)
+    if (!--_nbKeyPressed && _sendChord)
     {
-        _onChord(chord);
+        _sendChord = false;
+        _onChord(_chord);
     }
 }
 
 void reset()
 {
     _playing = false;
-    _ticks = 0;
+    _clock = 0;
     _step = 0;
-    nbKeyPressed = 0;
-    sendChord = false;
+    _nbKeyPressed = 0;
+    _sendChord = false;
 
     for (uint8_t i = 0; i < 4; i++)
     {
-        lastNotes[0][i] = 0;
-        lastNotes[1][i] = 0;
-        chord[i] = 0;
+        _lastNotes[0][i] = 0;
+        _lastNotes[1][i] = 0;
+        _chord[i] = 0;
     }
 }
 

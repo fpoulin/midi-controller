@@ -22,7 +22,7 @@ void State::addChord(uint8_t *chord)
     this->_currChordInputId = ++this->_currChordInputId % 4;
 }
 
-void State::moveToStep(int step)
+void State::moveToStep(uint8_t step)
 {
     this->_currStep = step;
     this->_currBar = step / 16;
@@ -41,15 +41,21 @@ bool State::hasTrigOff(uint8_t channel)
     return this->_trigsOff[channel][this->_currBar % 2][this->_currTrig];
 }
 
-uint8_t *State::getNotes(uint8_t channel)
+bool State::isNoteSelected(uint8_t channel, uint8_t noteSelectionId)
 {
     uint8_t notesSel = this->_notesSel[channel][this->_currBar % 2][this->_currTrig];
+
+    // bitmap -> first 4 bits are the notes selection within the chord
+    return _notesToPlay[noteSelectionId] = ((128 >> noteSelectionId) & notesSel) != 0;
+}
+
+uint8_t* State::getNotes(uint8_t channel)
+{
     uint8_t choordSel = this->_chordSel[channel][this->_currBar % 8][this->_currBeat];
 
     for (uint8_t i = 0; i < 4; i++)
     {
-        // bitmap -> first 4 bits are the notes selection within the chord
-        this->_notesToPlay[i] = ((128 >> i) & notesSel) != 0
+        this->_notesToPlay[i] = this->isNoteSelected(channel, i)
             ? _chords[choordSel][i] + this->_transpose[channel]
             : 0;
     }
