@@ -4,10 +4,10 @@ State::State()
 {
     for (uint8_t i = 0; i < 4; i++)
     {
-        this->_chords[i][0] = 36 + i * 12;
-        this->_chords[i][1] = 39 + i * 12;
-        this->_chords[i][2] = 41 + i * 12;
-        this->_chords[i][3] = 43 + i * 12;
+        this->_chords[i][0] = 48 + i * 12;
+        this->_chords[i][1] = 51 + i * 12;
+        this->_chords[i][2] = 53 + i * 12;
+        this->_chords[i][3] = 55 + i * 12;
     }
 
     this->reset();
@@ -41,7 +41,8 @@ bool State::hasTrigOff(uint8_t channel)
     return this->_trigsOff[channel][this->_currBar % 2][this->_currTrig];
 }
 
-bool State::isChordSelected(uint8_t channel, uint8_t chordSelectionId) {
+bool State::isChordSelected(uint8_t channel, uint8_t chordSelectionId)
+{
     return this->_chordSel[0][this->_currBar % 8][this->_currBeat] == chordSelectionId;
 }
 
@@ -53,15 +54,15 @@ bool State::isNoteSelected(uint8_t channel, uint8_t noteSelectionId)
     return _notesToPlay[noteSelectionId] = ((128 >> noteSelectionId) & notesSel) != 0;
 }
 
-uint8_t* State::getNotes(uint8_t channel)
+uint8_t *State::getNotes(uint8_t channel)
 {
     uint8_t choordSel = this->_chordSel[channel][this->_currBar % 8][this->_currBeat];
 
     for (uint8_t i = 0; i < 4; i++)
     {
         this->_notesToPlay[i] = this->isNoteSelected(channel, i)
-            ? _chords[choordSel][i] + this->_transpose[channel]
-            : 0;
+                                    ? _chords[choordSel][i] + this->_transpose[channel]
+                                    : 0;
     }
 
     return this->_notesToPlay;
@@ -69,6 +70,8 @@ uint8_t* State::getNotes(uint8_t channel)
 
 void State::reset()
 {
+    randomSeed(millis());
+    
     this->_currChordInputId = 0;
 
     this->_currStep = 0;
@@ -81,8 +84,8 @@ void State::reset()
     {
         for (uint8_t j = 0; j < 4; j++)
         {
-            this->_chordSel[0][i][j] = i/2;
-            this->_chordSel[1][i][j] = i/2;
+            this->_chordSel[0][i][j] = i / 2;
+            this->_chordSel[1][i][j] = i / 2;
         }
     }
 
@@ -92,14 +95,35 @@ void State::reset()
         for (uint8_t j = 0; j < 16; j++)
         {
             // channel 1
-            this->_notesSel[0][i][j] = 128 >> (j / 4) % 4;
-            this->_trigsOn[0][i][j] = j % 2 == 0 ? 127 : 0; // trig every second step
+            this->_notesSel[0][i][j] = 128 >> random(0,4);
+            this->_trigsOn[0][i][j] = random(0,2) == 0;
             this->_trigsOff[0][i][j] = false;
 
             // channel 2
-            this->_notesSel[1][i][j] = 240;                 // full chord (11110000)
-            this->_trigsOn[1][i][j] = j % 32 == 0 ? 127 : 0; // trig every 2 bars
-            this->_trigsOff[1][i][j] = false;
+            if (j == 0)
+            {
+                this->_notesSel[1][i][j] = 240; // full chord (11110000)
+                this->_trigsOn[1][i][j] = 127;
+                this->_trigsOff[1][i][j] = false;
+            }
+            else if (j < 8)
+            {
+                this->_notesSel[1][i][j] = 240; // full chord (11110000)
+                this->_trigsOn[1][i][j] = 0;
+                this->_trigsOff[1][i][j] = j == 3;
+            }
+            else if (j < 12)
+            {
+                this->_notesSel[1][i][j] = 128 >> (j - 8);
+                this->_trigsOn[1][i][j] = 127;
+                this->_trigsOff[1][i][j] = false;
+            }
+            else
+            {
+                this->_notesSel[1][i][j] = 128 >> (15 - j);
+                this->_trigsOn[1][i][j] = true;
+                this->_trigsOff[1][i][j] = false;
+            }
         }
     }
 

@@ -7,7 +7,7 @@ class Gui
 {
 private:
     Screen _screen;
-    State _state;
+    State& _state;
     uint8_t _trigs[8];
     uint8_t _lastStep = 0;
 

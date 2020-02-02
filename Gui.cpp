@@ -21,6 +21,8 @@ void Gui::moveToStep(uint8_t step)
 
 void Gui::reset()
 {
+    this->_screen.clear();
+
     // iterate over 8 bars (chords sequence loop)
     for (uint8_t step = 0; step < 128; step+= 4)
     {
