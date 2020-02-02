@@ -8,31 +8,46 @@ Gui::Gui(State &state) : _state(state), _screen(Screen())
 
 void Gui::moveToStep(uint8_t step)
 {
-    step = step % 32;
-    uint8_t prev = (step + 31) % 32;
+    // chord cursor
+    this->_screen.setPixel((step / 4) % 32, 4, true);
+    this->_screen.setPixel(((step / 4) + 31) % 32, 4, false);
 
-    this->_screen.setPixel(step, 10, true);
-    this->_screen.setPixel(prev, 10, false);
+    // notes cursor
+    this->_screen.setPixel(step % 32, 15, true);
+    this->_screen.setPixel((step + 31) % 32, 15, false);
 
     this->_screen.repaint();
 }
 
 void Gui::reset()
 {
+    // iterate over 8 bars (chords sequence loop)
+    for (uint8_t step = 0; step < 128; step+= 4)
+    {
+        this->_state.moveToStep(step);
+
+        // draw chord selections (only one channel for now)
+        for (uint8_t selectionId = 0; selectionId < 4; selectionId++)
+        {
+            this->_screen.setPixel(step / 4, (3-selectionId), this->_state.isChordSelected(0, selectionId));
+        }
+    }
+
+    // iterate over 2 bars (notes sequence loop)
     for (uint8_t step = 0; step < 32; step++)
     {
         this->_state.moveToStep(step);
 
         // draw note selections
-        for (uint8_t noteSelectionId = 0; noteSelectionId < 4; noteSelectionId++)
+        for (uint8_t selectionId = 0; selectionId < 4; selectionId++)
         {
-            this->_screen.setPixel(step, (3-noteSelectionId), this->_state.isNoteSelected(0, noteSelectionId));
-            this->_screen.setPixel(step, (3-noteSelectionId) + 5, this->_state.isNoteSelected(1, noteSelectionId));
+            this->_screen.setPixel(step, (3-selectionId) + 5, this->_state.isNoteSelected(0, selectionId));
+            this->_screen.setPixel(step, (3-selectionId) + 10, this->_state.isNoteSelected(1, selectionId));
         }
 
-        // draw trigs
-        this->_screen.setPixel(step, 4, (this->_state.hasTrigOn(0) != 0));
-        this->_screen.setPixel(step, 9, (this->_state.hasTrigOn(1) != 0));
+        // draw note trigs
+        this->_screen.setPixel(step, 9, (this->_state.hasTrigOn(0) != 0));
+        this->_screen.setPixel(step, 14, (this->_state.hasTrigOn(1) != 0));
     }
 
     this->_screen.repaint();

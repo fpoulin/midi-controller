@@ -41,6 +41,10 @@ bool State::hasTrigOff(uint8_t channel)
     return this->_trigsOff[channel][this->_currBar % 2][this->_currTrig];
 }
 
+bool State::isChordSelected(uint8_t channel, uint8_t chordSelectionId) {
+    return this->_chordSel[0][this->_currBar % 8][this->_currBeat] == chordSelectionId;
+}
+
 bool State::isNoteSelected(uint8_t channel, uint8_t noteSelectionId)
 {
     uint8_t notesSel = this->_notesSel[channel][this->_currBar % 2][this->_currTrig];

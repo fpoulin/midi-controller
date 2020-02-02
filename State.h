@@ -27,7 +27,8 @@ public:
     void moveToStep(uint8_t step);
     uint8_t hasTrigOn(uint8_t channel);
     boolean hasTrigOff(uint8_t channel);
-    bool isNoteSelected(uint8_t channel, uint8_t noteSelection);
+    bool isChordSelected(uint8_t channel, uint8_t chordSelectionId);
+    bool isNoteSelected(uint8_t channel, uint8_t noteSelectionId);
     uint8_t *getNotes(uint8_t channel);
     void reset();
 };
