@@ -2,9 +2,11 @@
 #include "Gui.h"
 #include "MidiIo.h"
 #include "State.h"
+#include "SyncPulse.h"
 
 State _state;
 Gui _gui(_state);
+SyncPulse _syncPulse;
 
 void playStep(uint8_t step, void (*sendNote)(uint8_t channel, uint8_t *notes));
 void addChord(uint8_t *chord);
@@ -24,15 +26,22 @@ void setup()
     pinMode(PIN4, INPUT_PULLUP); // push 3
 
     midiIo::init(playStep, addChord, stop);
+    _syncPulse.setup();
 }
 
 void loop()
 {
     midiIo::loop();
+    _syncPulse.loop();
 }
 
 void playStep(uint8_t step, void (*sendNote)(uint8_t channel, uint8_t *notes))
 {
+    if (step % 2 == 0)
+    {
+        _syncPulse.sendPulse();
+    }
+    
     _state.moveToStep(step);
     _gui.moveToStep(step);
 
@@ -54,4 +63,5 @@ void stop()
 {
     _state.reset();
     _gui.reset();
+    _syncPulse.reset();
 }
