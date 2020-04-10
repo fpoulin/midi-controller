@@ -1,10 +1,7 @@
 #include "Controls.h"
 
-#define BTN1 2
-#define BTN2 3
-#define BTN3 4
-
-Controls::Controls()
+Controls::Controls(uint8_t pinBtn1, uint8_t pinBtn2, uint8_t pinBtn3)
+    : _btn1(pinBtn1), _btn2(pinBtn2), _btn3(pinBtn3)
 {
     pinMode(A1, INPUT); // linear
 
@@ -12,56 +9,28 @@ Controls::Controls()
     pinMode(A3, INPUT); // knob 3
     pinMode(A4, INPUT); // knob 2
     pinMode(A5, INPUT); // knob 1
-
-    pinMode(BTN1, INPUT_PULLUP); // push 1
-    pinMode(BTN2, INPUT_PULLUP); // push 2
-    pinMode(BTN3, INPUT_PULLUP); // push 3
 }
 
 void Controls::loop()
 {
-    unsigned long time = millis();
-    bool debounced = time - this->_debounce > 1000;
-
-    if (digitalRead(BTN1) == LOW)
-    {
-        if (!this->_btn1Pressed && debounced)
-        {
-            this->_debounce = time;
-            
-            
-            this->_onClickBtn1();
-        }
-    }
-    else
-    {
-        this->_btn1Pressed = false;
-    }
-
-    if (digitalRead(BTN2) == LOW)
-    {
-        this->_onClickBtn2();
-    }
-
-    if (digitalRead(BTN3) == LOW)
-    {
-        this->_onClickBtn3();
-    }
+    _btn1.peek();
+    _btn2.peek();
+    _btn3.peek();
 }
 
 void Controls::setHandleBtn1(void (*onClick)(void))
 {
-    this->_onClickBtn1 = onClick;
+    _btn1.setHandleBtn(onClick);
 }
 
 void Controls::setHandleBtn2(void (*onClick)(void))
 {
-    this->_onClickBtn2 = onClick;
+    _btn2.setHandleBtn(onClick);
 }
 
 void Controls::setHandleBtn3(void (*onClick)(void))
 {
-    this->_onClickBtn3 = onClick;
+    _btn3.setHandleBtn(onClick);
 }
 
 void Controls::setHandleKnob1(void (*onChange)(uint8_t oldValue, uint8_t newValue))

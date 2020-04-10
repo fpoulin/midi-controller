@@ -1,10 +1,15 @@
 #define ARDUINO 1000
 
+#include <arduino.h>
 #include "Screen.h"
 #include "Controls.h"
 
+#define BTN1 2
+#define BTN2 3
+#define BTN3 4
+
 Screen screen;
-Controls controls;
+Controls controls(BTN1, BTN2, BTN3);
 
 void handleBtn1();
 void handleBtn2();

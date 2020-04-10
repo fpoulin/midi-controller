@@ -1,22 +1,20 @@
+#include "PushButton.h"
+
 #pragma once
 
 class Controls
 {
 private:
-    unsigned long _debounce = 0;
-    bool _btn1Pressed = false;
-    bool _btn2Pressed = false;
-    bool _btn3Pressed = false;
-    void (*_onClickBtn1)(void);
-    void (*_onClickBtn2)(void);
-    void (*_onClickBtn3)(void);
+    PushButton _btn1; // push 1
+    PushButton _btn2; // push 2
+    PushButton _btn3; // push 3
     void (*_onChangeKnob1)(uint8_t oldValue, uint8_t newValue);
     void (*_onChangeKnob2)(uint8_t oldValue, uint8_t newValue);
     void (*_onChangeKnob3)(uint8_t oldValue, uint8_t newValue);
     void (*_onChangeKnob4)(uint8_t oldValue, uint8_t newValue);
     void (*_onChangeLinear)(uint8_t oldValue, uint8_t newValue);
 public:
-    Controls();
+    Controls(uint8_t pinBtn1, uint8_t pinBtn2, uint8_t pinBtn3);
     void loop();
     void setHandleBtn1(void (*onClick)(void));
     void setHandleBtn2(void (*onClick)(void));
