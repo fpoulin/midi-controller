@@ -29,7 +29,7 @@ void PushButton::peek()
     }
 }
 
-void PushButton::setHandleBtn(void (*onClick)(void))
+void PushButton::setCallback(void (*onClick)(void))
 {
     this->_onClick = onClick;
 }

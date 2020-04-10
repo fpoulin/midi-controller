@@ -1,59 +1,62 @@
 #include "Controls.h"
 
-Controls::Controls(uint8_t pinBtn1, uint8_t pinBtn2, uint8_t pinBtn3)
-    : _btn1(pinBtn1), _btn2(pinBtn2), _btn3(pinBtn3)
-{
-    pinMode(A1, INPUT); // linear
-
-    pinMode(A2, INPUT); // knob 4
-    pinMode(A3, INPUT); // knob 3
-    pinMode(A4, INPUT); // knob 2
-    pinMode(A5, INPUT); // knob 1
-}
+Controls::Controls(PushButton btn1, PushButton btn2, PushButton btn3, Potentiometer rot1, Potentiometer rot2, Potentiometer rot3, Potentiometer rot4, Potentiometer lin)
+    : _btn1(btn1), _btn2(btn2), _btn3(btn3), _rot1(rot1), _rot2(rot2), _rot3(rot3), _rot4(rot4), _lin(lin) {}
 
 void Controls::loop()
 {
-    _btn1.peek();
-    _btn2.peek();
-    _btn3.peek();
+    unsigned long time = millis();
+    if (time - this->_lastPeek > 100)
+    {
+        _btn1.peek();
+        _btn2.peek();
+        _btn3.peek();
+        _rot1.peek();
+        _rot2.peek();
+        _rot3.peek();
+        _rot4.peek();
+        _lin.peek();
+
+        this->_lastPeek = time;
+    }
 }
 
 void Controls::setHandleBtn1(void (*onClick)(void))
 {
-    _btn1.setHandleBtn(onClick);
+    this->_btn1.setCallback(onClick);
 }
 
 void Controls::setHandleBtn2(void (*onClick)(void))
 {
-    _btn2.setHandleBtn(onClick);
+    this->_btn2.setCallback(onClick);
 }
 
 void Controls::setHandleBtn3(void (*onClick)(void))
 {
-    _btn3.setHandleBtn(onClick);
+    this->_btn3.setCallback(onClick);
 }
 
-void Controls::setHandleKnob1(void (*onChange)(uint8_t oldValue, uint8_t newValue))
+void Controls::setHandleRotary1(void (*onChange)(uint8_t oldValue, uint8_t newValue), uint8_t min, uint8_t max)
 {
-    this->_onChangeKnob1 = onChange;
+    this->_rot1.setCallback(onChange, min, max);
 }
 
-void Controls::setHandleKnob2(void (*onChange)(uint8_t oldValue, uint8_t newValue))
+void Controls::setHandleRotary2(void (*onChange)(uint8_t oldValue, uint8_t newValue), uint8_t min, uint8_t max)
 {
-    this->_onChangeKnob2 = onChange;
+    this->_rot2.setCallback(onChange, min, max);
 }
 
-void Controls::setHandleKnob3(void (*onChange)(uint8_t oldValue, uint8_t newValue))
+void Controls::setHandleRotary3(void (*onChange)(uint8_t oldValue, uint8_t newValue), uint8_t min, uint8_t max)
 {
-    this->_onChangeKnob3 = onChange;
+    this->_rot3.setCallback(onChange, min, max);
 }
 
-void Controls::setHandleKnob4(void (*onChange)(uint8_t oldValue, uint8_t newValue))
+void Controls::setHandleRotary4(void (*onChange)(uint8_t oldValue, uint8_t newValue), uint8_t min, uint8_t max)
 {
-    this->_onChangeKnob4 = onChange;
+    this->_rot4.setCallback(onChange, min, max);
 }
 
-void Controls::setHandleLinear(void (*onChange)(uint8_t oldValue, uint8_t newValue))
+void Controls::setHandleLinear1(void (*onChange)(uint8_t oldValue, uint8_t newValue), uint8_t min, uint8_t max)
 {
-    this->_onChangeLinear = onChange;
+    this->_lin.setCallback(onChange, min, max);
 }

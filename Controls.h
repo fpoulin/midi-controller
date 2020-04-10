@@ -1,27 +1,29 @@
 #include "PushButton.h"
+#include "Potentiometer.h"
 
 #pragma once
 
 class Controls
 {
 private:
-    PushButton _btn1; // push 1
-    PushButton _btn2; // push 2
-    PushButton _btn3; // push 3
-    void (*_onChangeKnob1)(uint8_t oldValue, uint8_t newValue);
-    void (*_onChangeKnob2)(uint8_t oldValue, uint8_t newValue);
-    void (*_onChangeKnob3)(uint8_t oldValue, uint8_t newValue);
-    void (*_onChangeKnob4)(uint8_t oldValue, uint8_t newValue);
-    void (*_onChangeLinear)(uint8_t oldValue, uint8_t newValue);
+    unsigned long _lastPeek = 0;
+    PushButton _btn1;
+    PushButton _btn2;
+    PushButton _btn3;
+    Potentiometer _rot1;
+    Potentiometer _rot2;
+    Potentiometer _rot3;
+    Potentiometer _rot4;
+    Potentiometer _lin;
 public:
-    Controls(uint8_t pinBtn1, uint8_t pinBtn2, uint8_t pinBtn3);
+    Controls(PushButton btn1, PushButton btn2, PushButton btn3, Potentiometer rot1, Potentiometer rot2, Potentiometer rot3, Potentiometer rot4, Potentiometer lin);
     void loop();
     void setHandleBtn1(void (*onClick)(void));
     void setHandleBtn2(void (*onClick)(void));
     void setHandleBtn3(void (*onClick)(void));
-    void setHandleKnob1(void (*onChange)(uint8_t oldValue, uint8_t newValue));
-    void setHandleKnob2(void (*onChange)(uint8_t oldValue, uint8_t newValue));
-    void setHandleKnob3(void (*onChange)(uint8_t oldValue, uint8_t newValue));
-    void setHandleKnob4(void (*onChange)(uint8_t oldValue, uint8_t newValue));
-    void setHandleLinear(void (*onChange)(uint8_t oldValue, uint8_t newValue));
+    void setHandleRotary1(void (*onChange)(uint8_t oldValue, uint8_t newValue), uint8_t min, uint8_t max);
+    void setHandleRotary2(void (*onChange)(uint8_t oldValue, uint8_t newValue), uint8_t min, uint8_t max);
+    void setHandleRotary3(void (*onChange)(uint8_t oldValue, uint8_t newValue), uint8_t min, uint8_t max);
+    void setHandleRotary4(void (*onChange)(uint8_t oldValue, uint8_t newValue), uint8_t min, uint8_t max);
+    void setHandleLinear1(void (*onChange)(uint8_t oldValue, uint8_t newValue), uint8_t min, uint8_t max);
 };

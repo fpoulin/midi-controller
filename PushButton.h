@@ -12,5 +12,5 @@ private:
 public:
     PushButton(uint8_t pin);
     void peek();
-    void setHandleBtn(void (*onClick)(void));
+    void setCallback(void (*onClick)(void));
 };
