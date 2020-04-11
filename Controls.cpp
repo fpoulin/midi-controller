@@ -1,21 +1,22 @@
 #include "Controls.h"
 
-Controls::Controls(PushButton btn1, PushButton btn2, PushButton btn3, Potentiometer rot1, Potentiometer rot2, Potentiometer rot3, Potentiometer rot4, Potentiometer lin)
-    : _btn1(btn1), _btn2(btn2), _btn3(btn3), _rot1(rot1), _rot2(rot2), _rot3(rot3), _rot4(rot4), _lin(lin) {}
+#define CONTROLS_READ_FREQ 10
+
+Controls::Controls(PushButton btn1, PushButton btn2, PushButton btn3, Potentiometer pot1, Potentiometer pot2, Potentiometer pot3, Potentiometer pot4)
+    : _btn1(btn1), _btn2(btn2), _btn3(btn3), _pot1(pot1), _pot2(pot2), _pot3(pot3), _pot4(pot4) {}
 
 void Controls::loop()
 {
     unsigned long time = millis();
-    if (time - this->_lastPeek > 100)
+    if (time - this->_lastPeek > 10)
     {
-        _btn1.peek();
-        _btn2.peek();
-        _btn3.peek();
-        _rot1.peek();
-        _rot2.peek();
-        _rot3.peek();
-        _rot4.peek();
-        _lin.peek();
+        this->_btn1.peek();
+        this->_btn2.peek();
+        this->_btn3.peek();
+        this->_pot1.peek();
+        this->_pot2.peek();
+        this->_pot3.peek();
+        this->_pot4.peek();
 
         this->_lastPeek = time;
     }
@@ -36,27 +37,22 @@ void Controls::setHandleBtn3(void (*onClick)(void))
     this->_btn3.setCallback(onClick);
 }
 
-void Controls::setHandleRotary1(void (*onChange)(uint8_t oldValue, uint8_t newValue), uint8_t min, uint8_t max)
+void Controls::setHandlePot1(void (*onChange)(uint8_t oldValue, uint8_t newValue), uint8_t min, uint8_t max)
 {
-    this->_rot1.setCallback(onChange, min, max);
+    this->_pot1.setCallback(onChange, min, max);
 }
 
-void Controls::setHandleRotary2(void (*onChange)(uint8_t oldValue, uint8_t newValue), uint8_t min, uint8_t max)
+void Controls::setHandlePot2(void (*onChange)(uint8_t oldValue, uint8_t newValue), uint8_t min, uint8_t max)
 {
-    this->_rot2.setCallback(onChange, min, max);
+    this->_pot2.setCallback(onChange, min, max);
 }
 
-void Controls::setHandleRotary3(void (*onChange)(uint8_t oldValue, uint8_t newValue), uint8_t min, uint8_t max)
+void Controls::setHandlePot3(void (*onChange)(uint8_t oldValue, uint8_t newValue), uint8_t min, uint8_t max)
 {
-    this->_rot3.setCallback(onChange, min, max);
+    this->_pot3.setCallback(onChange, min, max);
 }
 
-void Controls::setHandleRotary4(void (*onChange)(uint8_t oldValue, uint8_t newValue), uint8_t min, uint8_t max)
+void Controls::setHandlePot4(void (*onChange)(uint8_t oldValue, uint8_t newValue), uint8_t min, uint8_t max)
 {
-    this->_rot4.setCallback(onChange, min, max);
-}
-
-void Controls::setHandleLinear1(void (*onChange)(uint8_t oldValue, uint8_t newValue), uint8_t min, uint8_t max)
-{
-    this->_lin.setCallback(onChange, min, max);
+    this->_pot4.setCallback(onChange, min, max);
 }
