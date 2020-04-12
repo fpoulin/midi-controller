@@ -1,6 +1,8 @@
 #include <MIDI.h>
 #include "MidiIo.h"
 
+#define MIDI_CHANNEL_IN 1
+
 BEGIN_MIDI_IO_NAMESPACE
 
 void handleClock();
@@ -36,7 +38,7 @@ void init(
 
     reset();
 
-    MIDI.begin(MIDI_CHANNEL_OMNI);
+    MIDI.begin(MIDI_CHANNEL_IN);
     MIDI.turnThruOff();
     MIDI.setHandleClock(handleClock);
     MIDI.setHandleStart(handleStart);

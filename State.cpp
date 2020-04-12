@@ -40,7 +40,7 @@ bool State::hasTrigOff(uint8_t step, uint8_t channel)
 
 bool State::isChordSelected(uint8_t step, uint8_t channel, uint8_t chordSelectionId)
 {
-    return this->_chordSel[0][this->getBar(step) % 8][this->getBeat(step)] == chordSelectionId;
+    return this->_chordSel[channel][this->getBar(step) % 8][this->getBeat(step)] == chordSelectionId;
 }
 
 bool State::isNoteSelected(uint8_t step, uint8_t channel, uint8_t noteSelectionId)
@@ -135,13 +135,13 @@ void State::reset()
             // channel 2
             if (j == 0)
             {
-                this->_notesSel[1][i][j] = 240; // full chord (11110000)
+                this->_notesSel[1][i][j] = 224; // triplet (11100000)
                 this->_trigsOn[1][i][j] = 127;
                 this->_trigsOff[1][i][j] = false;
             }
             else if (j < 8)
             {
-                this->_notesSel[1][i][j] = 240; // full chord (11110000)
+                this->_notesSel[1][i][j] = 128;
                 this->_trigsOn[1][i][j] = 0;
                 this->_trigsOff[1][i][j] = j == 3;
             }
