@@ -12,6 +12,8 @@ private:
     uint8_t _lastStep = 0;
     uint8_t _cursorX = 0;
     uint8_t _cursorY = 0;
+    bool _cursorBlinkState = false;
+    unsigned long _lastBlink = 0;
     unsigned long _lastRepaint = 0;
 
     void redrawChords();

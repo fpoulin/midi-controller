@@ -58,7 +58,7 @@ uint8_t *State::getNotes(uint8_t step, uint8_t channel)
     for (uint8_t i = 0; i < 4; i++)
     {
         this->_notesToPlay[i] = this->isNoteSelected(step, channel, i)
-            ? _chords[choordSel][i] + this->_transpose[channel]
+            ? _chords[choordSel][i] + (this->_transpose[channel] - 2) * 12
             : 0;
     }
 
@@ -99,6 +99,11 @@ void State::setNoteSelected(uint8_t step, uint8_t channel, uint8_t noteSelection
     {
         this->_notesSel[channel][this->getBar(step) % 2][this->getTrig(step)] &= ~mask;
     }
+}
+
+void State::setTranspose(uint8_t channel, uint8_t octave)
+{
+    this->_transpose[channel] = octave;
 }
 
 void State::reset()
@@ -155,7 +160,7 @@ void State::reset()
         }
     }
 
-    // transpose
-    this->_transpose[0] = 0;
-    this->_transpose[1] = 0;
+    // transpose (setting octave nb, starting at -2)
+    this->_transpose[0] = 2;
+    this->_transpose[1] = 1;
 }

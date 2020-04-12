@@ -12,7 +12,7 @@ private:
     uint8_t _notesSel[2][2][16]; // selection of notes: [channel][bar][trig]
     uint8_t _trigsOn[2][2][16];  // triggers on: [channel][bar][trig]
     boolean _trigsOff[2][2][16]; // triggers off: [channel][bar][trig]
-    int8_t _transpose[2];        // transpose semi-tones: [channel]
+    uint8_t _transpose[2];       // transpose octave: [channel] (shifted by -2)
 
     uint8_t _notesToPlay[4]; // buffer for notes to be played
 
@@ -33,6 +33,7 @@ public:
     void setTrig(uint8_t step, uint8_t channel, bool state);
     void setChordSelected(uint8_t step, uint8_t chordSelectionId);
     void setNoteSelected(uint8_t step, uint8_t channel, uint8_t noteSelectionId, bool state);
+    void setTranspose(uint8_t channel, uint8_t octave);
 
     void reset();
 };

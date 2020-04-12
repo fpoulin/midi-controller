@@ -41,8 +41,8 @@ void setup()
     _controls.setHandleBtn3(handleBtn3);
     _controls.setHandlePot1(handlePot1, 0, 15); // move y
     _controls.setHandlePot2(handlePot2, 0, 31); // move x
-    _controls.setHandlePot3(handlePot3, -2, 2);
-    _controls.setHandlePot4(handlePot4, -2, 2);
+    _controls.setHandlePot3(handlePot3, 0, 4);
+    _controls.setHandlePot4(handlePot4, 0, 4);
 }
 
 void loop()
@@ -111,10 +111,10 @@ void handlePot2(uint8_t oldValue, uint8_t newValue)
 
 void handlePot3(uint8_t oldValue, uint8_t newValue)
 {
-    // do nothing for now (later: control transpose channel 1)
+    _state.setTranspose(0, newValue);
 }
 
 void handlePot4(uint8_t oldValue, uint8_t newValue)
 {
-    // do nothing for now  (later: control transpose channel 2)
+    _state.setTranspose(1, newValue);
 }

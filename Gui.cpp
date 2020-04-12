@@ -2,6 +2,7 @@
 #include <arduino.h>
 #include "Gui.h"
 
+#define CURSOR_BLINK_RATE 200
 #define REPAINT_RATE 10
 
 Gui::Gui(State &state) : _state(state), _screen(Screen())
@@ -12,8 +13,16 @@ Gui::Gui(State &state) : _state(state), _screen(Screen())
 void Gui::loop()
 {
     unsigned long now = millis();
+
+    if((now - this->_lastBlink) >= CURSOR_BLINK_RATE) {
+        this->_lastBlink = now;
+        this->_cursorBlinkState = !this->_cursorBlinkState;
+    }
+
     if ((now - this->_lastRepaint) >= REPAINT_RATE)
     {
+        this->_lastRepaint = now;
+        this->_screen.setPixel(this->_cursorX, this->_cursorY, this->_cursorBlinkState);
         this->_screen.repaint();
     }
 }
@@ -32,14 +41,12 @@ void Gui::renderStep(uint8_t step)
 void Gui::moveCursorX(uint8_t n)
 {
     this->redrawAt(this->_cursorY);
-    this->_screen.setPixel(n, this->_cursorY, true);
     this->_cursorX = n;
 }
 
 void Gui::moveCursorY(uint8_t n)
 {
     this->redrawAt(this->_cursorY);
-    this->_screen.setPixel(this->_cursorX, n, true);
     this->_cursorY = n;
 }
 
