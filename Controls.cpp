@@ -2,7 +2,7 @@
 
 #define CONTROLS_READ_FREQ 10
 
-Controls::Controls(PushButton btn1, PushButton btn2, PushButton btn3, Potentiometer pot1, Potentiometer pot2, Potentiometer pot3, Potentiometer pot4)
+Controls::Controls(PushButton &btn1, PushButton &btn2, PushButton &btn3, Potentiometer &pot1, Potentiometer &pot2, Potentiometer &pot3, Potentiometer &pot4)
     : _btn1(btn1), _btn2(btn2), _btn3(btn3), _pot1(pot1), _pot2(pot2), _pot3(pot3), _pot4(pot4) {}
 
 void Controls::loop()

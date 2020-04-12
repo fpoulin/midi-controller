@@ -5,12 +5,7 @@
 class State
 {
 private:
-    uint8_t _currChordInputId; // 0-4
-
-    uint8_t _currStep; // 0-255
-    uint8_t _currBar;  // 0-8
-    uint8_t _currBeat; // 0-4
-    uint8_t _currTrig; // 0-16
+    uint8_t _currChordInputId; // 0-3
 
     uint8_t _chords[4][4];       // 4 chords of 4 notes
     uint8_t _chordSel[2][8][4];  // selection of a chord: [channel][bar][beat]
@@ -21,19 +16,18 @@ private:
 
     uint8_t _notesToPlay[4]; // buffer for notes to be played
 
-    uint8_t getCurTrig(uint8_t step);
-    uint8_t getCurBeat(uint8_t step);
-    uint8_t getCurBar(uint8_t step);
+    uint8_t getTrig(uint8_t step);
+    uint8_t getBeat(uint8_t step);
+    uint8_t getBar(uint8_t step);
 
 public:
     State();
-    
-    void moveToStep(uint8_t step);
-    uint8_t hasTrigOn(uint8_t channel);
-    boolean hasTrigOff(uint8_t channel);
-    bool isChordSelected(uint8_t channel, uint8_t chordSelectionId);
-    bool isNoteSelected(uint8_t channel, uint8_t noteSelectionId);
-    uint8_t *getNotes(uint8_t channel);
+
+    uint8_t hasTrigOn(uint8_t step, uint8_t channel);
+    boolean hasTrigOff(uint8_t step, uint8_t channel);
+    bool isChordSelected(uint8_t step, uint8_t channel, uint8_t chordSelectionId);
+    bool isNoteSelected(uint8_t step, uint8_t channel, uint8_t noteSelectionId);
+    uint8_t *getNotes(uint8_t step, uint8_t channel);
 
     void addChord(uint8_t *chord);
     void setTrig(uint8_t step, uint8_t channel, bool state);

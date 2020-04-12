@@ -13,59 +13,51 @@ State::State()
     this->reset();
 }
 
-void State::moveToStep(uint8_t step)
-{
-    this->_currStep = step;
-    this->_currBar = this->getCurBar(step);
-    this->_currBeat = this->getCurBeat(step);
-    this->_currTrig = this->getCurTrig(step);
-}
-
-uint8_t State::getCurTrig(uint8_t step)
+uint8_t State::getTrig(uint8_t step)
 {
     return step % 16;
 }
 
-uint8_t State::getCurBeat(uint8_t step)
+uint8_t State::getBeat(uint8_t step)
 {
     return (step / 4) % 4;
 }
 
-uint8_t State::getCurBar(uint8_t step)
+uint8_t State::getBar(uint8_t step)
 {
     return step / 16;
 }
 
-uint8_t State::hasTrigOn(uint8_t channel)
+uint8_t State::hasTrigOn(uint8_t step, uint8_t channel)
 {
-    return this->_trigsOn[channel][this->_currBar % 2][this->_currTrig];
+    return this->_trigsOn[channel][this->getBar(step) % 2][this->getTrig(step)];
 }
 
-bool State::hasTrigOff(uint8_t channel)
+bool State::hasTrigOff(uint8_t step, uint8_t channel)
 {
-    return this->_trigsOff[channel][this->_currBar % 2][this->_currTrig];
+    return this->_trigsOff[channel][this->getBar(step) % 2][this->getTrig(step)];
 }
 
-bool State::isChordSelected(uint8_t channel, uint8_t chordSelectionId)
+bool State::isChordSelected(uint8_t step, uint8_t channel, uint8_t chordSelectionId)
 {
-    return this->_chordSel[0][this->_currBar % 8][this->_currBeat] == chordSelectionId;
+    return this->_chordSel[0][this->getBar(step) % 8][this->getBeat(step)] == chordSelectionId;
 }
 
-bool State::isNoteSelected(uint8_t channel, uint8_t noteSelectionId)
+bool State::isNoteSelected(uint8_t step, uint8_t channel, uint8_t noteSelectionId)
 {
-    uint8_t notesSel = this->_notesSel[channel][this->_currBar % 2][this->_currTrig];
+    uint8_t notesSel = this->_notesSel[channel][this->getBar(step) % 2][this->getTrig(step)];
 
     // bitmap -> first 4 bits are the notes selection within the chord
     return _notesToPlay[noteSelectionId] = ((128 >> noteSelectionId) & notesSel) != 0;
 }
 
-uint8_t *State::getNotes(uint8_t channel)
+uint8_t *State::getNotes(uint8_t step, uint8_t channel)
 {
-    uint8_t choordSel = this->_chordSel[channel][this->_currBar % 8][this->_currBeat];
+    uint8_t choordSel = this->_chordSel[channel][this->getBar(step) % 8][this->getBeat(step)];
 
     for (uint8_t i = 0; i < 4; i++)
     {
-        this->_notesToPlay[i] = this->isNoteSelected(channel, i)
+        this->_notesToPlay[i] = this->isNoteSelected(step, channel, i)
             ? _chords[choordSel][i] + this->_transpose[channel]
             : 0;
     }
@@ -85,14 +77,14 @@ void State::addChord(uint8_t *chord)
 void State::setTrig(uint8_t step, uint8_t channel, bool state)
 {
     // triggers on: [channel][bar%2][trig]
-    this->_trigsOn[channel][this->getCurBar(step) % 2][this->getCurTrig(step)] = state ? 127 : 0;
+    this->_trigsOn[channel][this->getBar(step) % 2][this->getTrig(step)] = state ? 127 : 0;
 }
 
 void State::setChordSelected(uint8_t step, uint8_t chordSelectionId)
 {
     // selection of a chord: [channel][bar%8][beat]
-    this->_chordSel[0][this->getCurBar(step) % 8][this->getCurBeat(step)] = chordSelectionId;
-    this->_chordSel[1][this->getCurBar(step) % 8][this->getCurBeat(step)] = chordSelectionId;
+    this->_chordSel[0][this->getBar(step) % 8][this->getBeat(step)] = chordSelectionId;
+    this->_chordSel[1][this->getBar(step) % 8][this->getBeat(step)] = chordSelectionId;
 }
 
 void State::setNoteSelected(uint8_t step, uint8_t channel, uint8_t noteSelectionId, bool state)
@@ -101,12 +93,12 @@ void State::setNoteSelected(uint8_t step, uint8_t channel, uint8_t noteSelection
     uint8_t mask = 128 >> noteSelectionId;
     if (state)
     {
-        this->_notesSel[channel][this->getCurBar(step) % 2][this->getCurTrig(step)] |= mask;
+        this->_notesSel[channel][this->getBar(step) % 2][this->getTrig(step)] |= mask;
     }
     else
     {
         mask = ~mask;
-        this->_notesSel[channel][this->getCurBar(step) % 2][this->getCurTrig(step)] &= mask;
+        this->_notesSel[channel][this->getBar(step) % 2][this->getTrig(step)] &= mask;
     }
 }
 
@@ -115,11 +107,6 @@ void State::reset()
     randomSeed(millis());
 
     this->_currChordInputId = 0;
-
-    this->_currStep = 0;
-    this->_currBar = 0;
-    this->_currBeat = 0;
-    this->_currTrig = 0;
 
     // chords selections
     for (uint8_t i = 0; i < 8; i++)

@@ -10,14 +10,14 @@
 State _state;
 Gui _gui(_state);
 SyncPulse _syncPulse;
-Controls _controls(
-    PushButton(PIN2),
-    PushButton(PIN3),
-    PushButton(PIN4),
-    Potentiometer(A2),
-    Potentiometer(A3),
-    Potentiometer(A4),
-    Potentiometer(A5));
+PushButton _btn1(PIN2);
+PushButton _btn2(PIN3);
+PushButton _btn3(PIN4);
+Potentiometer _pot1(A2);
+Potentiometer _pot2(A3);
+Potentiometer _pot3(A4);
+Potentiometer _pot4(A5);
+Controls _controls(_btn1, _btn2, _btn3, _pot1, _pot2, _pot3, _pot4);
 
 void playStep(uint8_t step, void (*sendNote)(uint8_t channel, uint8_t *notes));
 void addChord(uint8_t *chord);
@@ -33,6 +33,7 @@ void handlePot4(uint8_t oldValue, uint8_t newValue);
 void setup()
 {
     midiIo::init(playStep, addChord, stop);
+
     _syncPulse.setup();
 
     _controls.setHandleBtn1(handleBtn1);
@@ -57,17 +58,16 @@ void playStep(uint8_t step, void (*sendNote)(uint8_t channel, uint8_t *notes))
     {
         _syncPulse.sendPulse();
     }
-    
-    _state.moveToStep(step);
-    _gui.renderStep(step);
 
     for (uint8_t channel = 0; channel < 2; channel++)
     {
-        if (_state.hasTrigOn(channel) != 0)
+        if (_state.hasTrigOn(step, channel) != 0)
         {
-            sendNote(channel, _state.getNotes(channel));
+            sendNote(channel, _state.getNotes(step, channel));
         }
     }
+
+    _gui.renderStep(step);
 }
 
 void addChord(uint8_t *chord)

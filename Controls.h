@@ -7,15 +7,15 @@ class Controls
 {
 private:
     unsigned long _lastPeek = 0;
-    PushButton _btn1;
-    PushButton _btn2;
-    PushButton _btn3;
-    Potentiometer _pot1;
-    Potentiometer _pot2;
-    Potentiometer _pot3;
-    Potentiometer _pot4;
+    PushButton &_btn1;
+    PushButton &_btn2;
+    PushButton &_btn3;
+    Potentiometer &_pot1;
+    Potentiometer &_pot2;
+    Potentiometer &_pot3;
+    Potentiometer &_pot4;
 public:
-    Controls(PushButton btn1, PushButton btn2, PushButton btn3, Potentiometer pot1, Potentiometer pot2, Potentiometer pot3, Potentiometer pot4);
+    Controls(PushButton &btn1, PushButton &btn2, PushButton &btn3, Potentiometer &pot1, Potentiometer &pot2, Potentiometer &pot3, Potentiometer &pot4);
     void loop();
     void setHandleBtn1(void (*onClick)(void));
     void setHandleBtn2(void (*onClick)(void));

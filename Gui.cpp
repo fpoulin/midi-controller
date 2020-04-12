@@ -82,32 +82,27 @@ void Gui::reset()
     // iterate over 8 bars (chords sequence loop)
     for (uint8_t step = 0; step < 128; step += 4)
     {
-        this->_state.moveToStep(step);
-
         // draw chord selections (only one channel for now)
         for (uint8_t selectionId = 0; selectionId < 4; selectionId++)
         {
-            this->_screen.setPixel(step / 4, (3 - selectionId), this->_state.isChordSelected(0, selectionId));
+            this->_screen.setPixel(step / 4, (3 - selectionId), this->_state.isChordSelected(step, 0, selectionId));
         }
     }
 
     // iterate over 2 bars (notes sequence loop)
     for (uint8_t step = 0; step < 32; step++)
     {
-        this->_state.moveToStep(step);
-
         // draw note selections
         for (uint8_t selectionId = 0; selectionId < 4; selectionId++)
         {
-            this->_screen.setPixel(step, (3 - selectionId) + 5, this->_state.isNoteSelected(0, selectionId));
-            this->_screen.setPixel(step, (3 - selectionId) + 10, this->_state.isNoteSelected(1, selectionId));
+            this->_screen.setPixel(step, (3 - selectionId) + 5, this->_state.isNoteSelected(step, 0, selectionId));
+            this->_screen.setPixel(step, (3 - selectionId) + 10, this->_state.isNoteSelected(step, 1, selectionId));
         }
 
         // draw note trigs
-        this->_screen.setPixel(step, 9, (this->_state.hasTrigOn(0) != 0));
-        this->_screen.setPixel(step, 14, (this->_state.hasTrigOn(1) != 0));
+        this->_screen.setPixel(step, 9, (this->_state.hasTrigOn(step, 0) != 0));
+        this->_screen.setPixel(step, 14, (this->_state.hasTrigOn(step, 1) != 0));
     }
 
     this->_screen.repaint();
-    this->_state.moveToStep(0);
 }
