@@ -1,6 +1,6 @@
 #pragma once
 
-#define RAVG_BUFFER_SIZE 4
+#define RAVG_BUFFER_SIZE 8
 
 #include <Arduino.h>
 

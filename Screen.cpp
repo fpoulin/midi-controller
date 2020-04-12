@@ -6,7 +6,7 @@ Screen::Screen() : _dmt1(LedControl(11, 9, 10, 4)), _dmt2(LedControl(8, 6, 7, 4)
     clear();
 }
 
-void Screen::setPixel(uint8_t x, uint8_t y, boolean state)
+void Screen::setPixel(uint8_t x, uint8_t y, bool state)
 {
     if (x < 0 || x > 31 || y < 0 || y > 15)
     {
@@ -30,6 +30,23 @@ void Screen::setPixel(uint8_t x, uint8_t y, boolean state)
         // clear the bit (row AND 10111111)
         row &= ~_bitmap;
     }
+}
+
+bool Screen::getPixel(uint8_t x, uint8_t y)
+{
+    if (x < 0 || x > 31 || y < 0 || y > 15)
+    {
+        return false;
+    }
+
+    // pick the right dmt
+    uint8_t row = y < 8
+        ? this->_dmt1RowsCur[y][x / 8]
+        : this->_dmt2RowsCur[y % 8][x / 8];
+
+    // x=18 -> bitmap = 01000000 (swapped)
+    this->_bitmap = 0x01 << (x % 8);
+    return row & this->_bitmap;
 }
 
 void Screen::repaint()

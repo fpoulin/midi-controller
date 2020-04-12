@@ -21,14 +21,24 @@ private:
 
     uint8_t _notesToPlay[4]; // buffer for notes to be played
 
+    uint8_t getCurTrig(uint8_t step);
+    uint8_t getCurBeat(uint8_t step);
+    uint8_t getCurBar(uint8_t step);
+
 public:
     State();
-    void addChord(uint8_t *chord);
+    
     void moveToStep(uint8_t step);
     uint8_t hasTrigOn(uint8_t channel);
     boolean hasTrigOff(uint8_t channel);
     bool isChordSelected(uint8_t channel, uint8_t chordSelectionId);
     bool isNoteSelected(uint8_t channel, uint8_t noteSelectionId);
     uint8_t *getNotes(uint8_t channel);
+
+    void addChord(uint8_t *chord);
+    void setTrig(uint8_t step, uint8_t channel, bool state);
+    void setChordSelected(uint8_t step, uint8_t chordSelectionId);
+    void setNoteSelected(uint8_t step, uint8_t channel, uint8_t noteSelectionId, bool state);
+
     void reset();
 };

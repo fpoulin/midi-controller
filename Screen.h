@@ -17,7 +17,8 @@ private:
 
 public:
     Screen();
-    void setPixel(uint8_t x, uint8_t y, boolean state);
+    void setPixel(uint8_t x, uint8_t y, bool state);
+    bool getPixel(uint8_t x, uint8_t y);
     void repaint();
     void clear();
 };
