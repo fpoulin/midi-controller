@@ -1,9 +1,21 @@
 #include <LedControl.h>
+#include <arduino.h>
 #include "Gui.h"
+
+#define REPAINT_RATE 10
 
 Gui::Gui(State &state) : _state(state), _screen(Screen())
 {
     this->reset();
+}
+
+void Gui::loop()
+{
+    unsigned long now = millis();
+    if ((now - this->_lastRepaint) >= REPAINT_RATE)
+    {
+        this->_screen.repaint();
+    }
 }
 
 void Gui::renderStep(uint8_t step)
@@ -15,17 +27,19 @@ void Gui::renderStep(uint8_t step)
     // notes cursor
     this->_screen.setPixel(step % 32, 15, true);
     this->_screen.setPixel((step + 31) % 32, 15, false);
-
-    this->_screen.repaint();
 }
 
 void Gui::moveCursorX(uint8_t n)
 {
+    this->redrawAt(this->_cursorY);
+    this->_screen.setPixel(n, this->_cursorY, true);
     this->_cursorX = n;
 }
 
 void Gui::moveCursorY(uint8_t n)
 {
+    this->redrawAt(this->_cursorY);
+    this->_screen.setPixel(this->_cursorX, n, true);
     this->_cursorY = n;
 }
 
@@ -49,7 +63,7 @@ void Gui::clickCursor(bool toggle)
     case 6:
     case 7:
     case 8:
-        this->_state.setNoteSelected(this->_cursorX, 0, (3 - this->_cursorY - 5), toggle);
+        this->_state.setNoteSelected(this->_cursorX, 0, (3 - (this->_cursorY - 5)), toggle);
         break;
 
     // 9 -> channel 1 trigs
@@ -62,7 +76,7 @@ void Gui::clickCursor(bool toggle)
     case 11:
     case 12:
     case 13:
-        this->_state.setNoteSelected(this->_cursorX, 1, (3 - this->_cursorY - 10), toggle);
+        this->_state.setNoteSelected(this->_cursorX, 1, (3 - (this->_cursorY - 10)), toggle);
         break;
 
     // 14 -> channel 2 trigs
@@ -70,15 +84,26 @@ void Gui::clickCursor(bool toggle)
         this->_state.setTrig(this->_cursorX, 1, toggle);
         break;
     }
-
-    // apply on screen (faster than re-rendering the whole thing)
-    this->reset(); // ############## for test
 }
 
-void Gui::reset()
+void Gui::redrawAt(uint8_t y)
 {
-    this->_screen.clear();
+    if (y < 5)
+    {
+        this->redrawChords();
+    }
+    else if (y < 10)
+    {
+        this->redrawChannel(0);
+    }
+    else
+    {
+        this->redrawChannel(1);
+    }
+}
 
+void Gui::redrawChords()
+{
     // iterate over 8 bars (chords sequence loop)
     for (uint8_t step = 0; step < 128; step += 4)
     {
@@ -88,6 +113,11 @@ void Gui::reset()
             this->_screen.setPixel(step / 4, (3 - selectionId), this->_state.isChordSelected(step, 0, selectionId));
         }
     }
+}
+
+void Gui::redrawChannel(uint8_t channel)
+{
+    uint8_t vShift = channel == 0 ? 5 : 10;
 
     // iterate over 2 bars (notes sequence loop)
     for (uint8_t step = 0; step < 32; step++)
@@ -95,14 +125,19 @@ void Gui::reset()
         // draw note selections
         for (uint8_t selectionId = 0; selectionId < 4; selectionId++)
         {
-            this->_screen.setPixel(step, (3 - selectionId) + 5, this->_state.isNoteSelected(step, 0, selectionId));
-            this->_screen.setPixel(step, (3 - selectionId) + 10, this->_state.isNoteSelected(step, 1, selectionId));
+            this->_screen.setPixel(step, (3 - selectionId) + vShift, this->_state.isNoteSelected(step, channel, selectionId));
         }
 
         // draw note trigs
-        this->_screen.setPixel(step, 9, (this->_state.hasTrigOn(step, 0) != 0));
-        this->_screen.setPixel(step, 14, (this->_state.hasTrigOn(step, 1) != 0));
+        this->_screen.setPixel(step, vShift + 4, (this->_state.hasTrigOn(step, channel) != 0));
     }
+}
 
-    this->_screen.repaint();
+void Gui::reset()
+{
+    this->_screen.clear();
+
+    this->redrawChords();
+    this->redrawChannel(0);
+    this->redrawChannel(1);
 }

@@ -50,6 +50,7 @@ void loop()
     midiIo::loop();
     _syncPulse.loop();
     _controls.loop();
+    _gui.loop();
 }
 
 void playStep(uint8_t step, void (*sendNote)(uint8_t channel, uint8_t *notes))

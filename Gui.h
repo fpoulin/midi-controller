@@ -12,9 +12,15 @@ private:
     uint8_t _lastStep = 0;
     uint8_t _cursorX = 0;
     uint8_t _cursorY = 0;
+    unsigned long _lastRepaint = 0;
+
+    void redrawChords();
+    void redrawChannel(uint8_t channel);
+    void redrawAt(uint8_t y);
 
 public:
     Gui(State &state);
+    void loop();
     void renderStep(uint8_t step);
     void moveCursorX(uint8_t n);
     void moveCursorY(uint8_t n);

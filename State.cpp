@@ -97,8 +97,7 @@ void State::setNoteSelected(uint8_t step, uint8_t channel, uint8_t noteSelection
     }
     else
     {
-        mask = ~mask;
-        this->_notesSel[channel][this->getBar(step) % 2][this->getTrig(step)] &= mask;
+        this->_notesSel[channel][this->getBar(step) % 2][this->getTrig(step)] &= ~mask;
     }
 }
 
