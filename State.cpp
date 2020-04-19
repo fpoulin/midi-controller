@@ -2,15 +2,18 @@
 
 State::State()
 {
+    uint8_t scale[] = { 48, 50, 51, 53, 55, 56, 58, 60 }; // c minor
+    uint8_t scaleSize = 8;
+
     for (uint8_t i = 0; i < 4; i++)
     {
-        this->_chords[i][0] = 48 + i * 12;
-        this->_chords[i][1] = 51 + i * 12;
-        this->_chords[i][2] = 53 + i * 12;
-        this->_chords[i][3] = 55 + i * 12;
+        this->_chords[i][0] = scale[i % scaleSize];
+        this->_chords[i][1] = scale[(i + 2) % scaleSize];
+        this->_chords[i][2] = this->_chords[i][0] + 12;
+        this->_chords[i][3] = this->_chords[i][1] + 12;
     }
 
-    this->reset();
+    this->reset(false);
 }
 
 uint8_t State::getTrig(uint8_t step)
@@ -30,12 +33,7 @@ uint8_t State::getBar(uint8_t step)
 
 uint8_t State::hasTrigOn(uint8_t step, uint8_t channel)
 {
-    return this->_trigsOn[channel][this->getBar(step) % 2][this->getTrig(step)];
-}
-
-bool State::hasTrigOff(uint8_t step, uint8_t channel)
-{
-    return this->_trigsOff[channel][this->getBar(step) % 2][this->getTrig(step)];
+    return this->_trigs[channel][this->getBar(step) % 2][this->getTrig(step)];
 }
 
 bool State::isChordSelected(uint8_t step, uint8_t channel, uint8_t chordSelectionId)
@@ -57,9 +55,10 @@ uint8_t *State::getNotes(uint8_t step, uint8_t channel)
 
     for (uint8_t i = 0; i < 4; i++)
     {
-        this->_notesToPlay[i] = this->isNoteSelected(step, channel, i)
-            ? _chords[choordSel][i] + (this->_transpose[channel] - 2) * 12
-            : 0;
+        this->_notesToPlay[i] =
+            this->isNoteSelected(step, channel, i)
+                ? _chords[choordSel][i] + (this->_transpose[channel] - 2) * 12
+                : 0;
     }
 
     return this->_notesToPlay;
@@ -77,7 +76,7 @@ void State::addChord(uint8_t *chord)
 void State::setTrig(uint8_t step, uint8_t channel, bool state)
 {
     // triggers on: [channel][bar%2][trig]
-    this->_trigsOn[channel][this->getBar(step) % 2][this->getTrig(step)] = state ? 127 : 0;
+    this->_trigs[channel][this->getBar(step) % 2][this->getTrig(step)] = state ? 127 : 0;
 }
 
 void State::setChordSelected(uint8_t step, uint8_t chordSelectionId)
@@ -106,11 +105,16 @@ void State::setTranspose(uint8_t channel, uint8_t octave)
     this->_transpose[channel] = octave;
 }
 
-void State::reset()
+void State::reset(bool soft)
 {
-    randomSeed(millis());
-
     this->_currChordInputId = 0;
+
+    if (soft)
+    {
+        return;
+    }
+
+    randomSeed(millis());
 
     // chords selections
     for (uint8_t i = 0; i < 8; i++)
@@ -129,33 +133,23 @@ void State::reset()
         {
             // channel 1
             this->_notesSel[0][i][j] = 128 >> random(0, 4);
-            this->_trigsOn[0][i][j] = random(0, 2) == 0 ? 127 : 0;
-            this->_trigsOff[0][i][j] = false;
+            this->_trigs[0][i][j] = 127;
 
             // channel 2
-            if (j == 0)
+            if (j % 4 == 0)
             {
-                this->_notesSel[1][i][j] = 224; // triplet (11100000)
-                this->_trigsOn[1][i][j] = 127;
-                this->_trigsOff[1][i][j] = false;
+                this->_notesSel[1][i][j] = 192; // 1100000
+                this->_trigs[1][i][j] = 127;
             }
-            else if (j < 8)
+            else if (j % 3 == 0)
             {
-                this->_notesSel[1][i][j] = 128;
-                this->_trigsOn[1][i][j] = 0;
-                this->_trigsOff[1][i][j] = j == 3;
-            }
-            else if (j < 12)
-            {
-                this->_notesSel[1][i][j] = 128 >> (j - 8);
-                this->_trigsOn[1][i][j] = 127;
-                this->_trigsOff[1][i][j] = false;
+                this->_notesSel[1][i][j] = 48; // 00110000
+                this->_trigs[1][i][j] = 127;
             }
             else
             {
-                this->_notesSel[1][i][j] = 128 >> (15 - j);
-                this->_trigsOn[1][i][j] = true;
-                this->_trigsOff[1][i][j] = false;
+                this->_notesSel[1][i][j] = 128;
+                this->_trigs[1][i][j] = 0;
             }
         }
     }

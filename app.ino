@@ -78,6 +78,7 @@ void addChord(uint8_t *chord)
 
 void stop()
 {
+    _state.reset(true);
     _gui.reset();
     _syncPulse.reset();
 }
@@ -94,7 +95,7 @@ void handleBtn2()
 
 void handleBtn3()
 {
-    _state.reset();
+    _state.reset(true);
     _gui.reset();
 }
 
