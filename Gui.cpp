@@ -1,28 +1,40 @@
-#include <LedControl.h>
 #include <arduino.h>
 #include "Gui.h"
 
 #define CURSOR_BLINK_RATE 200
 #define REPAINT_RATE 10
 
-Gui::Gui(State &state) : _state(state), _screen(Screen())
+Gui::Gui(State &state) : _state(state), _screen(Screen()), _splash(Splash(_screen))
 {
-    this->reset();
+    this->_splash.play();
 }
 
 void Gui::loop()
 {
     unsigned long now = millis();
 
-    if((now - this->_lastBlink) >= CURSOR_BLINK_RATE) {
+    if ((now - this->_lastBlink) >= CURSOR_BLINK_RATE)
+    {
         this->_lastBlink = now;
         this->_cursorBlinkState = !this->_cursorBlinkState;
     }
 
     if ((now - this->_lastRepaint) >= REPAINT_RATE)
     {
+        if (this->_splash.isPlaying())
+        {
+            this->_splash.loop();
+        }
+        else if (this->_splash.justFinished())
+        {
+            this->reset();
+        }
+        else
+        {
+            this->_screen.setPixel(this->_cursorX, this->_cursorY, this->_cursorBlinkState);
+        }
+
         this->_lastRepaint = now;
-        this->_screen.setPixel(this->_cursorX, this->_cursorY, this->_cursorBlinkState);
         this->_screen.repaint();
     }
 }

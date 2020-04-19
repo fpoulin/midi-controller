@@ -1,5 +1,6 @@
 #include "Screen.h"
 #include "State.h"
+#include "Splash.h"
 
 #pragma once
 
@@ -12,6 +13,7 @@ private:
     uint8_t _lastStep = 0;
     uint8_t _cursorX = 0;
     uint8_t _cursorY = 0;
+    Splash _splash;
     bool _cursorBlinkState = false;
     unsigned long _lastBlink = 0;
     unsigned long _lastRepaint = 0;
@@ -27,5 +29,6 @@ public:
     void moveCursorX(uint8_t n);
     void moveCursorY(uint8_t n);
     void clickCursor(bool toggle);
+    void splash();
     void reset();
 };

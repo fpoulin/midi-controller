@@ -16,11 +16,11 @@ class State
 private:
     uint8_t _currChordInputId; // 0-(NB_CHORDS-1)
 
-    uint8_t _chords[NB_CHORDS][NB_NOTES_PER_CHORD];                     // NB_CHORDS chords of NOTES_PER_CHORD notes
-    uint8_t _chordSel[NB_CHANNELS][NB_CHORD_BARS][NB_CHORDS_PER_BAR];   // selection of a chord: [channel][bar][beat*]
-    uint8_t _notesSel[NB_CHANNELS][NB_NOTES_BARS][NB_NOTES_PER_BAR]; // selection of notes: [channel][bar][trig*]
-    uint8_t _trigs[NB_CHANNELS][NB_NOTES_BARS][NB_NOTES_PER_BAR];    // triggers: [channel][bar][trig*]
-    uint8_t _transpose[NB_CHANNELS];                                 // transpose octave: [channel] (shifted by -2)
+    uint8_t _chords[NB_CHORDS][NB_NOTES_PER_CHORD];                   // NB_CHORDS chords of NOTES_PER_CHORD notes
+    uint8_t _chordSel[NB_CHANNELS][NB_CHORD_BARS][NB_CHORDS_PER_BAR]; // selection of a chord: [channel][bar][beat*]
+    uint8_t _notesSel[NB_CHANNELS][NB_NOTES_BARS][NB_NOTES_PER_BAR];  // selection of notes: [channel][bar][trig*]
+    uint8_t _trigs[NB_CHANNELS][NB_NOTES_BARS][NB_NOTES_PER_BAR];     // triggers: [channel][bar][trig*]
+    uint8_t _transpose[NB_CHANNELS];                                  // transpose octave: [channel] (shifted by -2)
 
     uint8_t _notesToPlay[NB_NOTES_PER_CHORD]; // buffer for notes to be played
 
