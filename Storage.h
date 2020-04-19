@@ -9,6 +9,6 @@ private:
 
 public:
     Storage(State &state);
-    void writeState();
+    void writeState(); // use with caution
     bool restoreState();
 };

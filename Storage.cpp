@@ -71,8 +71,11 @@ bool Storage::restoreState()
     uint8_t version = EEPROM.read(idx++);
     if (version != VERSION)
     {
+        this->_state.reset(false);
         return false;
     }
+
+    this->_state.reset(true);
 
     // chords
     for (uint8_t i = 0; i < NB_CHORDS; i++)

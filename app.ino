@@ -2,12 +2,14 @@
 #include "Gui.h"
 #include "MidiIo.h"
 #include "State.h"
+#include "Storage.h"
 #include "SyncPulse.h"
 #include "Controls.h"
 #include "PushButton.h"
 #include "Potentiometer.h"
 
 State _state;
+Storage _storage(_state);
 Gui _gui(_state);
 SyncPulse _syncPulse;
 PushButton _btn1(PIN2);
@@ -34,6 +36,7 @@ void setup()
 {
     midiIo::init(playStep, addChord, stop);
 
+    _storage.restoreState();
     _syncPulse.setup();
 
     _controls.setHandleBtn1(handleBtn1);
@@ -95,7 +98,7 @@ void handleBtn2()
 
 void handleBtn3()
 {
-    _state.reset(true);
+    _storage.writeState();
     _gui.reset();
 }
 
