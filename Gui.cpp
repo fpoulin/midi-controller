@@ -6,7 +6,8 @@
 
 Gui::Gui(State &state) : _state(state), _screen(Screen()), _splash(Splash(_screen))
 {
-    this->_splash.play();
+    this->reset();
+    this->_splash.play(0);
 }
 
 void Gui::loop()
@@ -27,7 +28,7 @@ void Gui::loop()
         }
         else if (this->_splash.justFinished())
         {
-            this->reset();
+            this->redrawChords();
         }
         else
         {
