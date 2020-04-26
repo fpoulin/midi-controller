@@ -63,9 +63,7 @@ const uint8_t __PICTOS[8][5] = {
         (uint8_t)0x00  // 00000000
     }};
 
-Splash::Splash(Screen &screen) : _screen(screen)
-{
-}
+Splash::Splash(Screen &screen) : _screen(screen) { }
 
 bool Splash::isPlaying()
 {
@@ -94,16 +92,16 @@ void Splash::loop()
 {
     if (this->_playing)
     {
-        uint8_t _posX = this->getPosX();
+        uint8_t _posXShifted = this->getPosXShifted();
 
         for (uint8_t x = 0; x < 32; x++)
         {
             for (uint8_t y = 0; y < 5; y++)
             {
                 // draw picto
-                if (x >= _posX-8 && x <= _posX)
+                if (x >= _posXShifted-8 && x <= _posXShifted)
                 {
-                    this->_bitmap = 128 >> x - (_posX-8);
+                    this->_bitmap = 128 >> x - (_posXShifted-8);
                     this->_screen.setPixel(x, y, (__PICTOS[this->_pictoId][y] & this->_bitmap) != 0);
                 }
                 else
@@ -123,7 +121,7 @@ void Splash::loop()
 }
 
 // returns the x position of the sprite (shifted by 8 pixels -> unsigned)
-uint8_t Splash::getPosX()
+uint8_t Splash::getPosXShifted()
 {
     // move in: exponential ease out
     if (this->_frame < MOVE_IN_FRAMES)
@@ -140,6 +138,5 @@ uint8_t Splash::getPosX()
 
     // move out: exponential ease in
     float x = (this->_frame - (NB_FRAMES - MOVE_OUT_FRAMES)) / (float)MOVE_OUT_FRAMES;
-    //x = x == 0 ? 0 : pow(2, (10. * x) - 10.);
     return floor((1. - x) * 20.); // [0..20]
 }

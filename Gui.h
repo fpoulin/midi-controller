@@ -14,6 +14,7 @@ private:
     uint8_t _cursorX = 0;
     uint8_t _cursorY = 0;
     Splash _splash;
+    uint8_t _mode = 0;
     bool _cursorBlinkState = false;
     unsigned long _lastBlink = 0;
     unsigned long _lastRepaint = 0;
@@ -28,7 +29,7 @@ public:
     void renderStep(uint8_t step);
     void moveCursorX(uint8_t n);
     void moveCursorY(uint8_t n);
-    void clickCursor(bool toggle);
-    void splash();
+    void clickCursor();
+    void switchMode(uint8_t mode);
     void reset();
 };

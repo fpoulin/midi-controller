@@ -21,6 +21,8 @@ Potentiometer _pot3(A4);
 Potentiometer _pot4(A5);
 Controls _controls(_btn1, _btn2, _btn3, _pot1, _pot2, _pot3, _pot4);
 
+uint8_t _mode = 0;
+
 void playStep(uint8_t step, void (*sendNote)(uint8_t channel, uint8_t *notes));
 void addChord(uint8_t *chord);
 void stop();
@@ -88,12 +90,14 @@ void stop()
 
 void handleBtn1()
 {
-    _gui.clickCursor(true);
+    _mode++;
+    _mode = _mode% 8;
+    _gui.switchMode(_mode);
 }
 
 void handleBtn2()
 {
-    _gui.clickCursor(false);
+    _gui.clickCursor();
 }
 
 void handleBtn3()

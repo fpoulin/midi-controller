@@ -7,7 +7,7 @@
 Gui::Gui(State &state) : _state(state), _screen(Screen()), _splash(Splash(_screen))
 {
     this->reset();
-    this->_splash.play(0);
+    this->_splash.play(this->_mode);
 }
 
 void Gui::loop()
@@ -63,8 +63,11 @@ void Gui::moveCursorY(uint8_t n)
     this->_cursorY = n;
 }
 
-void Gui::clickCursor(bool toggle)
+void Gui::clickCursor()
 {
+    uint8_t selectionId;
+    bool current;
+
     switch ((int)this->_cursorY)
     {
     // 0-3 -> chords
@@ -72,10 +75,7 @@ void Gui::clickCursor(bool toggle)
     case 1:
     case 2:
     case 3:
-        if (toggle)
-        {
-            this->_state.setChordSelected(this->_cursorX * 4, (3 - this->_cursorY));
-        }
+        this->_state.setChordSelected(this->_cursorX * 4, (3 - this->_cursorY));
         break;
 
     // 5-8 -> channel 1 note selections
@@ -83,12 +83,15 @@ void Gui::clickCursor(bool toggle)
     case 6:
     case 7:
     case 8:
-        this->_state.setNoteSelected(this->_cursorX, 0, (3 - (this->_cursorY - 5)), toggle);
+        selectionId = 3 - (this->_cursorY - 5);
+        current = this->_state.isNoteSelected(this->_cursorX, 0, selectionId);
+        this->_state.setNoteSelected(this->_cursorX, 0, selectionId, !current);
         break;
 
     // 9 -> channel 1 trigs
     case 9:
-        this->_state.setTrig(this->_cursorX, 0, toggle);
+        current = this->_state.hasTrigOn(this->_cursorX, 0);
+        this->_state.setTrig(this->_cursorX, 0, !current);
         break;
 
     // 10-13 -> channel 2 note selections
@@ -96,12 +99,15 @@ void Gui::clickCursor(bool toggle)
     case 11:
     case 12:
     case 13:
-        this->_state.setNoteSelected(this->_cursorX, 1, (3 - (this->_cursorY - 10)), toggle);
+        selectionId = 3 - (this->_cursorY - 10);
+        current = this->_state.isNoteSelected(this->_cursorX, 1, selectionId);
+        this->_state.setNoteSelected(this->_cursorX, 1, selectionId, !current);
         break;
 
     // 14 -> channel 2 trigs
     case 14:
-        this->_state.setTrig(this->_cursorX, 1, toggle);
+        current = this->_state.hasTrigOn(this->_cursorX, 1);
+        this->_state.setTrig(this->_cursorX, 1, !current);
         break;
     }
 }
@@ -151,6 +157,12 @@ void Gui::redrawChannel(uint8_t channel)
         // draw note trigs
         this->_screen.setPixel(step, vShift + 4, (this->_state.hasTrigOn(step, channel) != 0));
     }
+}
+
+void Gui::switchMode(uint8_t mode) {
+
+    this-> _mode = mode;
+    this->_splash.play(mode);
 }
 
 void Gui::reset()

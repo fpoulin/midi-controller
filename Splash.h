@@ -14,7 +14,7 @@ private:
     uint8_t _bitmap;
     float _animPercent;
 
-    uint8_t getPosX();
+    uint8_t getPosXShifted();
 
 public:
     Splash(Screen &screen);
