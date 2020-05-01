@@ -7,28 +7,28 @@
 void SyncPulse::setup()
 {
     pinMode(PULSE_PIN_OUT, OUTPUT);
-    this->_isPulsing = false;
+    _isPulsing = false;
 }
 
 void SyncPulse::sendPulse()
 {
     digitalWrite(PULSE_PIN_OUT, HIGH);
-    this->_isPulsing = true;
-    this->_lastPulseAt = millis();
+    _isPulsing = true;
+    _lastPulseAt = millis();
 }
 
 void SyncPulse::loop()
 {
     // check if we are pulsing and need to stop it
-    if (this->_isPulsing && (millis() - this->_lastPulseAt) >= PULSE_MS)
+    if (_isPulsing && (millis() - _lastPulseAt) >= PULSE_MS)
     {
         digitalWrite(PULSE_PIN_OUT, LOW);
-        this->_isPulsing = false;
+        _isPulsing = false;
     }
 }
 
 void SyncPulse::reset()
 {
     digitalWrite(PULSE_PIN_OUT, LOW);
-    this->_isPulsing = false;
+    _isPulsing = false;
 }

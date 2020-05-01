@@ -6,57 +6,57 @@
 
 Gui::Gui(State &state) : _state(state), _screen(Screen()), _splash(Splash(_screen))
 {
-    this->reset();
-    this->_splash.play(this->_mode, *this);
+    reset();
+    _splash.play(_mode, *this);
 }
 
 void Gui::loop()
 {
     unsigned long now = millis();
 
-    if ((now - this->_lastBlink) >= CURSOR_BLINK_RATE)
+    if ((now - _lastBlink) >= CURSOR_BLINK_RATE)
     {
-        this->_lastBlink = now;
-        this->_cursorBlinkState = !this->_cursorBlinkState;
+        _lastBlink = now;
+        _cursorBlinkState = !_cursorBlinkState;
     }
 
-    if ((now - this->_lastRepaint) >= REPAINT_RATE)
+    if ((now - _lastRepaint) >= REPAINT_RATE)
     {
-        if (this->_splash.isPlaying())
+        if (_splash.isPlaying())
         {
-            this->_splash.loop();
+            _splash.loop();
         }
         else
         {
-            this->_screen.setPixel(this->_cursorX, this->_cursorY, this->_cursorBlinkState);
+            _screen.setPixel(_cursorX, _cursorY, _cursorBlinkState);
         }
 
-        this->_lastRepaint = now;
-        this->_screen.repaint();
+        _lastRepaint = now;
+        _screen.repaint();
     }
 }
 
 void Gui::renderStep(uint8_t step)
 {
     // chord cursor
-    this->_screen.setPixel((step / 4) % 32, 4, true);
-    this->_screen.setPixel(((step / 4) + 31) % 32, 4, false);
+    _screen.setPixel((step / 4) % 32, 4, true);
+    _screen.setPixel(((step / 4) + 31) % 32, 4, false);
 
     // notes cursor
-    this->_screen.setPixel(step % 32, 15, true);
-    this->_screen.setPixel((step + 31) % 32, 15, false);
+    _screen.setPixel(step % 32, 15, true);
+    _screen.setPixel((step + 31) % 32, 15, false);
 }
 
 void Gui::moveCursorX(uint8_t n)
 {
-    this->redrawAt(this->_cursorY);
-    this->_cursorX = n;
+    redrawAt(_cursorY);
+    _cursorX = n;
 }
 
 void Gui::moveCursorY(uint8_t n)
 {
-    this->redrawAt(this->_cursorY);
-    this->_cursorY = n;
+    redrawAt(_cursorY);
+    _cursorY = n;
 }
 
 void Gui::clickCursor()
@@ -64,14 +64,14 @@ void Gui::clickCursor()
     uint8_t selectionId;
     bool current;
 
-    switch ((int)this->_cursorY)
+    switch ((int)_cursorY)
     {
     // 0-3 -> chords
     case 0:
     case 1:
     case 2:
     case 3:
-        this->_state.setChordSelected(this->_cursorX * 4, (3 - this->_cursorY));
+        _state.setChordSelected(_cursorX * 4, (3 - _cursorY));
         break;
 
     // 5-8 -> channel 1 note selections
@@ -79,15 +79,15 @@ void Gui::clickCursor()
     case 6:
     case 7:
     case 8:
-        selectionId = 3 - (this->_cursorY - 5);
-        current = this->_state.isNoteSelected(this->_cursorX, 0, selectionId);
-        this->_state.setNoteSelected(this->_cursorX, 0, selectionId, !current);
+        selectionId = 3 - (_cursorY - 5);
+        current = _state.isNoteSelected(_cursorX, 0, selectionId);
+        _state.setNoteSelected(_cursorX, 0, selectionId, !current);
         break;
 
     // 9 -> channel 1 trigs
     case 9:
-        current = this->_state.hasTrigOn(this->_cursorX, 0);
-        this->_state.setTrig(this->_cursorX, 0, !current);
+        current = _state.hasTrigOn(_cursorX, 0);
+        _state.setTrig(_cursorX, 0, !current);
         break;
 
     // 10-13 -> channel 2 note selections
@@ -95,15 +95,15 @@ void Gui::clickCursor()
     case 11:
     case 12:
     case 13:
-        selectionId = 3 - (this->_cursorY - 10);
-        current = this->_state.isNoteSelected(this->_cursorX, 1, selectionId);
-        this->_state.setNoteSelected(this->_cursorX, 1, selectionId, !current);
+        selectionId = 3 - (_cursorY - 10);
+        current = _state.isNoteSelected(_cursorX, 1, selectionId);
+        _state.setNoteSelected(_cursorX, 1, selectionId, !current);
         break;
 
     // 14 -> channel 2 trigs
     case 14:
-        current = this->_state.hasTrigOn(this->_cursorX, 1);
-        this->_state.setTrig(this->_cursorX, 1, !current);
+        current = _state.hasTrigOn(_cursorX, 1);
+        _state.setTrig(_cursorX, 1, !current);
         break;
     }
 }
@@ -112,15 +112,15 @@ void Gui::redrawAt(uint8_t y)
 {
     if (y < 5)
     {
-        this->redrawChords();
+        redrawChords();
     }
     else if (y < 10)
     {
-        this->redrawChannel(0);
+        redrawChannel(0);
     }
     else
     {
-        this->redrawChannel(1);
+        redrawChannel(1);
     }
 }
 
@@ -132,7 +132,7 @@ void Gui::redrawChords()
         // draw chord selections (only one channel for now)
         for (uint8_t selectionId = 0; selectionId < 4; selectionId++)
         {
-            this->_screen.setPixel(step / 4, (3 - selectionId), this->_state.isChordSelected(step, 0, selectionId));
+            _screen.setPixel(step / 4, (3 - selectionId), _state.isChordSelected(step, 0, selectionId));
         }
     }
 }
@@ -147,30 +147,30 @@ void Gui::redrawChannel(uint8_t channel)
         // draw note selections
         for (uint8_t selectionId = 0; selectionId < 4; selectionId++)
         {
-            this->_screen.setPixel(step, (3 - selectionId) + vShift, this->_state.isNoteSelected(step, channel, selectionId));
+            _screen.setPixel(step, (3 - selectionId) + vShift, _state.isNoteSelected(step, channel, selectionId));
         }
 
         // draw note trigs
-        this->_screen.setPixel(step, vShift + 4, (this->_state.hasTrigOn(step, channel) != 0));
+        _screen.setPixel(step, vShift + 4, (_state.hasTrigOn(step, channel) != 0));
     }
 }
 
 void Gui::switchMode(uint8_t mode)
 {
-    this->_mode = mode;
-    this->_splash.play(mode, *this);
+    _mode = mode;
+    _splash.play(mode, *this);
 }
 
 void Gui::onSplashEnd()
 {
-    this->redrawChords();
+    redrawChords();
 }
 
 void Gui::reset()
 {
-    this->_screen.clear();
+    _screen.clear();
 
-    this->redrawChords();
-    this->redrawChannel(0);
-    this->redrawChannel(1);
+    redrawChords();
+    redrawChannel(0);
+    redrawChannel(1);
 }

@@ -10,26 +10,26 @@ PushButton::PushButton(uint8_t pin) : _pin(pin)
 
 void PushButton::peek()
 {
-    if (digitalRead(this->_pin) == LOW)
+    if (digitalRead(_pin) == LOW)
     {
-        if (!this->_clicking)
+        if (!_clicking)
         {
             unsigned long time = millis();
-            if (time - this->_lastClick > DEBOUNCE_TIME)
+            if (time - _lastClick > DEBOUNCE_TIME)
             {
-                this->_clicking = true;
-                this->_lastClick = time;
-                this->_onClick();
+                _clicking = true;
+                _lastClick = time;
+                _onClick();
             }
         }
     }
     else
     {
-        this->_clicking = false;
+        _clicking = false;
     }
 }
 
 void PushButton::setCallback(void (*onClick)(void))
 {
-    this->_onClick = onClick;
+    _onClick = onClick;
 }

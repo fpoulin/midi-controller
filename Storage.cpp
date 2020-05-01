@@ -15,7 +15,7 @@ void Storage::writeState()
     {
         for (uint8_t j = 0; j < NB_NOTES_PER_CHORD; j++)
         {
-            EEPROM.update(idx++, this->_state._chords[i][j]);
+            EEPROM.update(idx++, _state._chords[i][j]);
         }
     }
 
@@ -26,7 +26,7 @@ void Storage::writeState()
         {
             for (uint8_t j = 0; j < NB_CHORDS_PER_BAR; j++)
             {
-                EEPROM.update(idx++, this->_state._chordSel[c][i][j]);
+                EEPROM.update(idx++, _state._chordSel[c][i][j]);
             }
         }
     }
@@ -38,8 +38,8 @@ void Storage::writeState()
         {
             for (uint8_t j = 0; j < NB_NOTES_PER_BAR; j++)
             {
-                EEPROM.update(idx++, this->_state._notesSel[c][i][j]);
-                EEPROM.update(idx++, this->_state._trigs[c][i][j]);
+                EEPROM.update(idx++, _state._notesSel[c][i][j]);
+                EEPROM.update(idx++, _state._trigs[c][i][j]);
             }
         }
     }
@@ -47,7 +47,7 @@ void Storage::writeState()
     // transpositions
     for (uint8_t c = 0; c < NB_CHANNELS; c++)
     {
-        EEPROM.update(idx++, this->_state._transpose[c]);
+        EEPROM.update(idx++, _state._transpose[c]);
     }
 }
 
@@ -58,18 +58,18 @@ bool Storage::restoreState()
     uint8_t version = EEPROM.read(idx++);
     if (version != STORAGE_VERSION)
     {
-        this->_state.reset(false);
+        _state.reset(false);
         return false;
     }
 
-    this->_state.reset(true);
+    _state.reset(true);
 
     // chords
     for (uint8_t i = 0; i < NB_CHORDS; i++)
     {
         for (uint8_t j = 0; j < NB_NOTES_PER_CHORD; j++)
         {
-            this->_state._chords[i][j] = EEPROM.read(idx++);
+            _state._chords[i][j] = EEPROM.read(idx++);
         }
     }
 
@@ -80,7 +80,7 @@ bool Storage::restoreState()
         {
             for (uint8_t j = 0; j < NB_CHORDS_PER_BAR; j++)
             {
-                this->_state._chordSel[c][i][j] = EEPROM.read(idx++);
+                _state._chordSel[c][i][j] = EEPROM.read(idx++);
             }
         }
     }
@@ -92,8 +92,8 @@ bool Storage::restoreState()
         {
             for (uint8_t j = 0; j < NB_NOTES_PER_BAR; j++)
             {
-                this->_state._notesSel[c][i][j] = EEPROM.read(idx++);
-                this->_state._trigs[c][i][j] = EEPROM.read(idx++);
+                _state._notesSel[c][i][j] = EEPROM.read(idx++);
+                _state._trigs[c][i][j] = EEPROM.read(idx++);
             }
         }
     }
@@ -101,7 +101,7 @@ bool Storage::restoreState()
     // transpositions
     for (uint8_t c = 0; c < NB_CHANNELS; c++)
     {
-        this->_state._transpose[c] = EEPROM.read(idx++);
+        _state._transpose[c] = EEPROM.read(idx++);
     }
 
     return true;

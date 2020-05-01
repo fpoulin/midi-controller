@@ -8,51 +8,51 @@ Controls::Controls(PushButton &btn1, PushButton &btn2, PushButton &btn3, Potenti
 void Controls::loop()
 {
     unsigned long time = millis();
-    if (time - this->_lastPeek > 10)
+    if (time - _lastPeek > 10)
     {
-        this->_btn1.peek();
-        this->_btn2.peek();
-        this->_btn3.peek();
-        this->_pot1.peek();
-        this->_pot2.peek();
-        this->_pot3.peek();
-        this->_pot4.peek();
+        _btn1.peek();
+        _btn2.peek();
+        _btn3.peek();
+        _pot1.peek();
+        _pot2.peek();
+        _pot3.peek();
+        _pot4.peek();
 
-        this->_lastPeek = time;
+        _lastPeek = time;
     }
 }
 
 void Controls::setHandleBtn1(void (*onClick)(void))
 {
-    this->_btn1.setCallback(onClick);
+    _btn1.setCallback(onClick);
 }
 
 void Controls::setHandleBtn2(void (*onClick)(void))
 {
-    this->_btn2.setCallback(onClick);
+    _btn2.setCallback(onClick);
 }
 
 void Controls::setHandleBtn3(void (*onClick)(void))
 {
-    this->_btn3.setCallback(onClick);
+    _btn3.setCallback(onClick);
 }
 
 void Controls::setHandlePot1(void (*onChange)(uint8_t oldValue, uint8_t newValue), uint8_t min, uint8_t max)
 {
-    this->_pot1.setCallback(onChange, min, max);
+    _pot1.setCallback(onChange, min, max);
 }
 
 void Controls::setHandlePot2(void (*onChange)(uint8_t oldValue, uint8_t newValue), uint8_t min, uint8_t max)
 {
-    this->_pot2.setCallback(onChange, min, max);
+    _pot2.setCallback(onChange, min, max);
 }
 
 void Controls::setHandlePot3(void (*onChange)(uint8_t oldValue, uint8_t newValue), uint8_t min, uint8_t max)
 {
-    this->_pot3.setCallback(onChange, min, max);
+    _pot3.setCallback(onChange, min, max);
 }
 
 void Controls::setHandlePot4(void (*onChange)(uint8_t oldValue, uint8_t newValue), uint8_t min, uint8_t max)
 {
-    this->_pot4.setCallback(onChange, min, max);
+    _pot4.setCallback(onChange, min, max);
 }

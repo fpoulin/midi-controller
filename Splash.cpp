@@ -67,22 +67,22 @@ Splash::Splash(Screen &screen) : _screen(screen) { }
 
 bool Splash::isPlaying()
 {
-    return this->_playing;
+    return _playing;
 }
 
 void Splash::play(uint8_t splashPictoId, SplashCallback &onFinish)
 {
-    this->_pictoId = splashPictoId;
-    this->_frame = 0;
-    this->_playing = true;
-    this->_onFinish = &onFinish;
+    _pictoId = splashPictoId;
+    _frame = 0;
+    _playing = true;
+    _onFinish = &onFinish;
 }
 
 void Splash::loop()
 {
-    if (this->_playing)
+    if (_playing)
     {
-        uint8_t _posXShifted = this->getPosXShifted();
+        uint8_t _posXShifted = getPosXShifted();
 
         for (uint8_t x = 0; x < 32; x++)
         {
@@ -91,21 +91,21 @@ void Splash::loop()
                 // draw picto
                 if (x >= _posXShifted-8 && x <= _posXShifted)
                 {
-                    this->_bitmap = 128 >> x - (_posXShifted-8);
-                    this->_screen.setPixel(x, y, (__PICTOS[this->_pictoId][y] & this->_bitmap) != 0);
+                    _bitmap = 128 >> x - (_posXShifted-8);
+                    _screen.setPixel(x, y, (__PICTOS[_pictoId][y] & _bitmap) != 0);
                 }
                 else
                 {
-                    this->_screen.setPixel(x, y, false);
+                    _screen.setPixel(x, y, false);
                 }
             }
         }
 
         // move one frame forward
-        if (++this->_frame >= NB_FRAMES)
+        if (++_frame >= NB_FRAMES)
         {
-            this->_playing = false;
-            this->_onFinish->onSplashEnd();
+            _playing = false;
+            _onFinish->onSplashEnd();
         }
     }
 }
@@ -114,19 +114,19 @@ void Splash::loop()
 uint8_t Splash::getPosXShifted()
 {
     // move in: exponential ease out
-    if (this->_frame < MOVE_IN_FRAMES)
+    if (_frame < MOVE_IN_FRAMES)
     {
-        float x = this->_frame / (float)MOVE_IN_FRAMES;
+        float x = _frame / (float)MOVE_IN_FRAMES;
         x = x == 1 ? 1 : 1 - pow(2, -10 * x);
         return 20 + floor((1. - x) * 28.); // [20..48]
     }
     // stick around for a bit
-    if (this->_frame < NB_FRAMES - MOVE_OUT_FRAMES)
+    if (_frame < NB_FRAMES - MOVE_OUT_FRAMES)
     {
         return 20;
     }
 
     // move out: exponential ease in
-    float x = (this->_frame - (NB_FRAMES - MOVE_OUT_FRAMES)) / (float)MOVE_OUT_FRAMES;
+    float x = (_frame - (NB_FRAMES - MOVE_OUT_FRAMES)) / (float)MOVE_OUT_FRAMES;
     return floor((1. - x) * 20.); // [0..20]
 }
