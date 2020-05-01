@@ -4,7 +4,7 @@
 
 #pragma once
 
-class Gui
+class Gui : private SplashCallback
 {
 private:
     Screen _screen;
@@ -19,17 +19,17 @@ private:
     unsigned long _lastBlink = 0;
     unsigned long _lastRepaint = 0;
 
-    void redrawChords();
-    void redrawChannel(uint8_t channel);
-    void redrawAt(uint8_t y);
-
 public:
     Gui(State &state);
     void loop();
     void renderStep(uint8_t step);
+    void redrawChords();
+    void redrawChannel(uint8_t channel);
+    void redrawAt(uint8_t y);
     void moveCursorX(uint8_t n);
     void moveCursorY(uint8_t n);
     void clickCursor();
     void switchMode(uint8_t mode);
+    void onSplashEnd();
     void reset();
 };

@@ -1,4 +1,5 @@
 #include "Screen.h"
+#include "SplashCallback.h"
 
 #pragma once
 
@@ -8,7 +9,7 @@ private:
     Screen &_screen;
     unsigned int _frame = 0;
     bool _playing = false;
-    bool _finished = false;
+    SplashCallback *_onFinish;
 
     uint8_t _pictoId;
     uint8_t _bitmap;
@@ -19,7 +20,6 @@ private:
 public:
     Splash(Screen &screen);
     bool isPlaying();
-    bool justFinished();
-    void play(uint8_t splashPictoId);
+    void play(uint8_t splashPictoId, SplashCallback &onFinish);
     void loop();
 };

@@ -70,22 +70,12 @@ bool Splash::isPlaying()
     return this->_playing;
 }
 
-bool Splash::justFinished()
-{
-    if (this->_finished)
-    {
-        this->_finished = false;
-        return true;
-    }
-    return false;
-}
-
-void Splash::play(uint8_t splashPictoId)
+void Splash::play(uint8_t splashPictoId, SplashCallback &onFinish)
 {
     this->_pictoId = splashPictoId;
     this->_frame = 0;
     this->_playing = true;
-    this->_finished = false;
+    this->_onFinish = &onFinish;
 }
 
 void Splash::loop()
@@ -115,7 +105,7 @@ void Splash::loop()
         if (++this->_frame >= NB_FRAMES)
         {
             this->_playing = false;
-            this->_finished = true;
+            this->_onFinish->onSplashEnd();
         }
     }
 }
