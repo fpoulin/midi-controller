@@ -1,8 +1,11 @@
+#include "Storage.h"
 #include <arduino.h>
 #include <EEPROM.h>
-#include "Storage.h"
 
-Storage::Storage(State &state) : _state(state) {}
+Storage::Storage(State &state) : _state(state)
+{
+    restoreState();
+}
 
 void Storage::writeState()
 {

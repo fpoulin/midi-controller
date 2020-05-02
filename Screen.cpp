@@ -1,4 +1,3 @@
-#include <LedControl.h>
 #include "Screen.h"
 
 Screen::Screen() : _dmt1(LedControl(11, 9, 10, 4)), _dmt2(LedControl(8, 6, 7, 4))

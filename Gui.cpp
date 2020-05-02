@@ -1,5 +1,5 @@
-#include <arduino.h>
 #include "Gui.h"
+#include <arduino.h>
 
 #define CURSOR_BLINK_RATE 200
 #define REPAINT_RATE 10

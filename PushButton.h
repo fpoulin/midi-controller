@@ -1,7 +1,7 @@
 #pragma once
 
-#include <Arduino.h>
 #include "BtnHandler.h"
+#include <Arduino.h>
 
 class PushButton
 {

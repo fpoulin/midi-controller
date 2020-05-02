@@ -1,6 +1,6 @@
-#include <LedControl.h>
-
 #pragma once
+
+#include <LedControl.h>
 
 class Screen
 {

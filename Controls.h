@@ -2,7 +2,6 @@
 
 #include "PushButton.h"
 #include "Potentiometer.h"
-#include "PotHandler.h"
 
 class Controls
 {

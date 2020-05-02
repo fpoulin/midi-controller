@@ -1,5 +1,4 @@
 #include "PushButton.h"
-#include <arduino.h>
 
 #define DEBOUNCE_TIME 500
 

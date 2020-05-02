@@ -1,6 +1,6 @@
-#include "State.h"
-
 #pragma once
+
+#include "State.h"
 
 class Storage
 {

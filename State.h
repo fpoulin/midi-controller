@@ -1,6 +1,6 @@
-#include <arduino.h>
-
 #pragma once
+
+#include <arduino.h>
 
 #define STORAGE_VERSION 1 // to be increased when changing constants below
 #define NB_CHORDS 4

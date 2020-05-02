@@ -1,5 +1,4 @@
 #include "Controls.h"
-#include "Mode.h"
 
 #define CONTROLS_READ_FREQ 10
 

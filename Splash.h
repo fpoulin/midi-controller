@@ -1,7 +1,7 @@
+#pragma once
+
 #include "Screen.h"
 #include "SplashCallback.h"
-
-#pragma once
 
 class Splash
 {

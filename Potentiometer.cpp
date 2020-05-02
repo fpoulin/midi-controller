@@ -1,4 +1,3 @@
-#include <arduino.h>
 #include "Potentiometer.h"
 
 Potentiometer::Potentiometer(uint8_t pin) : _pin(pin)
