@@ -9,20 +9,20 @@ Potentiometer::Potentiometer(uint8_t pin) : _pin(pin)
 
 void Potentiometer::peek()
 {
+    if(_callback == NULL) return;
+
     int raw = ravg(analogRead(_pin));
-    uint8_t mapped = map(raw, 0, 1024, _min, _max + 1);
-    if (mapped != _value && _onChange != NULL)
+    uint8_t mapped = map(raw, 0, 1024, _callback->getMin(), _callback->getMax() + 1);
+    if (mapped != _value)
     {
-        _onChange(_value, mapped);
+        _callback->onChange(_value, mapped);
         _value = mapped;
     }
 }
 
-void Potentiometer::setCallback(void (*onChange)(uint8_t oldValue, uint8_t newValue), uint8_t min, uint8_t max)
+void Potentiometer::setCallback(PotHandler &callback)
 {
-    _onChange = onChange;
-    _min = min;
-    _max = max;
+    _callback = &callback;
 }
 
 int Potentiometer::ravg(int x)

@@ -6,7 +6,7 @@
 #include "SyncPulse.h"
 #include "Controls.h"
 #include "PushButton.h"
-#include "Potentiometer.h"
+#include "ModePerform.h"
 
 State _state;
 Storage _storage(_state);
@@ -15,11 +15,9 @@ SyncPulse _syncPulse;
 PushButton _btn1(PIN2);
 PushButton _btn2(PIN3);
 PushButton _btn3(PIN4);
-Potentiometer _pot1(A2);
-Potentiometer _pot2(A3);
-Potentiometer _pot3(A4);
-Potentiometer _pot4(A5);
-Controls _controls(_btn1, _btn2, _btn3, _pot1, _pot2, _pot3, _pot4);
+
+Controls _controls(_btn1, _btn2, _btn3);
+ModePerform _modePerform(_controls, _gui, _state);
 
 uint8_t _mode = 0;
 
@@ -29,10 +27,6 @@ void stop();
 void handleBtn1();
 void handleBtn2();
 void handleBtn3();
-void handlePot1(uint8_t oldValue, uint8_t newValue);
-void handlePot2(uint8_t oldValue, uint8_t newValue);
-void handlePot3(uint8_t oldValue, uint8_t newValue);
-void handlePot4(uint8_t oldValue, uint8_t newValue);
 
 void setup()
 {
@@ -44,10 +38,7 @@ void setup()
     _controls.setHandleBtn1(handleBtn1);
     _controls.setHandleBtn2(handleBtn2);
     _controls.setHandleBtn3(handleBtn3);
-    _controls.setHandlePot1(handlePot1, 0, 15); // move y
-    _controls.setHandlePot2(handlePot2, 0, 31); // move x
-    _controls.setHandlePot3(handlePot3, 0, 4);
-    _controls.setHandlePot4(handlePot4, 0, 4);
+    _modePerform.Activate();
 }
 
 void loop()
@@ -104,24 +95,4 @@ void handleBtn3()
 {
     _storage.writeState();
     _gui.reset();
-}
-
-void handlePot1(uint8_t oldValue, uint8_t newValue)
-{
-    _gui.moveCursorY(newValue);
-}
-
-void handlePot2(uint8_t oldValue, uint8_t newValue)
-{
-    _gui.moveCursorX(newValue);
-}
-
-void handlePot3(uint8_t oldValue, uint8_t newValue)
-{
-    _state.setTranspose(0, newValue);
-}
-
-void handlePot4(uint8_t oldValue, uint8_t newValue)
-{
-    _state.setTranspose(1, newValue);
 }
