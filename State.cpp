@@ -180,7 +180,7 @@ void State::applyAllNudges()
                     ? _notesSel[channel][getBar(shiftedIndex) % NB_NOTES_BARS][getTrig(shiftedIndex)]
                     : _nudgeBuffer[i - (32 - _noteNudges[channel][0])];
 
-                // ex: for 10010000, nudge = 2: (00100100 | 01000000) & 11110000 = 01100000
+                // vertical nudge: for 10010000 and nudge = 2: (00100100 | 01000000) & 11110000 = 01100000
                 *ptr = (*ptr >> _noteNudges[channel][1] | *ptr << (4 - _noteNudges[channel][1])) & B11110000;
             }
         }

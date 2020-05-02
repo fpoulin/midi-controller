@@ -6,6 +6,7 @@
 
 #include "FaHandler.h"
 #include "BtnHandlerClickCursor.h"
+#include "BtnHandlerNudgeAction.h"
 #include "BtnHandlerSaveEeprom.h"
 #include "PotHandlerCursorX.h"
 #include "PotHandlerCursorY.h"
@@ -20,6 +21,8 @@ private:
 
     FaHandler _fa;
     BtnHandlerClickCursor _clickCursor;
+    BtnHandlerNudgeAction _nudgeReset;
+    BtnHandlerNudgeAction _nudgeApply;
     BtnHandlerSaveEeprom _saveEeprom;
     PotHandlerCursorX _cursorX;
     PotHandlerCursorY _cursorY;
@@ -30,7 +33,10 @@ private:
 
     uint8_t _mode;
 
+    void switchToMode(uint8_t mode);
+
 public:
     ModesManager(Gui &gui, State &state, Storage &storage, Controls &controls);
     void onClick() override;
+    void switchToPerform();
 };

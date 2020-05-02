@@ -6,7 +6,7 @@
 
 Gui::Gui(State &state) : _state(state), _screen(Screen()), _splash(Splash(_screen))
 {
-    reset();
+    redraw(true);
     _splash.play(_mode, *this);
 }
 
@@ -203,6 +203,18 @@ void Gui::redrawChannel(uint8_t channel)
     }
 }
 
+void Gui::redraw(bool resetScreen)
+{
+    if(resetScreen) 
+    {
+        _screen.clear();
+    }
+
+    redrawChords();
+    redrawChannel(0);
+    redrawChannel(1);
+}
+
 void Gui::switchMode(uint8_t mode)
 {
     _mode = mode;
@@ -213,13 +225,4 @@ void Gui::switchMode(uint8_t mode)
 void Gui::onSplashEnd()
 {
     redrawChords();
-}
-
-void Gui::reset()
-{
-    _screen.clear();
-
-    redrawChords();
-    redrawChannel(0);
-    redrawChannel(1);
 }

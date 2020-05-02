@@ -58,6 +58,6 @@ void addChord(uint8_t *chord)
 void stop()
 {
     _state.reset(true);
-    _gui.reset();
+    _gui.redraw(true);
     _syncPulse.reset();
 }

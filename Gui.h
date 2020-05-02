@@ -22,15 +22,18 @@ private:
 public:
     Gui(State &state);
     void loop();
+
     void renderStep(uint8_t step);
     void redrawChords();
     void redrawChannel(uint8_t channel);
     void redrawAt(uint8_t y);
+    void redraw(bool resetScreen);
+    
     void moveCursorX(uint8_t n);
     void moveCursorY(uint8_t n);
     void clickCursor();
+
     void nudge(uint8_t amount, bool horizontal);
     void switchMode(uint8_t mode);
     void onSplashEnd() override;
-    void reset();
 };

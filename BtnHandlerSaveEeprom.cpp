@@ -5,5 +5,5 @@ BtnHandlerSaveEeprom::BtnHandlerSaveEeprom(Storage &storage, Gui &gui): _storage
 void BtnHandlerSaveEeprom::onClick()
 {
     _storage.writeState();
-    _gui.reset();
+    _gui.redraw(true);
 }
