@@ -10,6 +10,7 @@
 #include "PotHandlerCursorX.h"
 #include "PotHandlerCursorY.h"
 #include "PotHandlerTranspose.h"
+#include "PotHandlerNudge.h"
 
 class ModesManager : public BtnHandler
 {
@@ -24,6 +25,8 @@ private:
     PotHandlerCursorY _cursorY;
     PotHandlerTranspose _transpose1;
     PotHandlerTranspose _transpose2;
+    PotHandlerNudge _nudgeH;
+    PotHandlerNudge _nudgeV;
 
     uint8_t _mode;
 

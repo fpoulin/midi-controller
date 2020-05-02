@@ -29,6 +29,7 @@ public:
     void moveCursorX(uint8_t n);
     void moveCursorY(uint8_t n);
     void clickCursor();
+    void nudge(uint8_t amount, bool horizontal);
     void switchMode(uint8_t mode);
     void onSplashEnd() override;
     void reset();

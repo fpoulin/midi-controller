@@ -22,6 +22,11 @@ private:
     uint8_t _trigs[NB_CHANNELS][NB_NOTES_BARS][NB_NOTES_PER_BAR];     // triggers: [channel][bar][trig*]
     uint8_t _transpose[NB_CHANNELS];                                  // transpose octave: [channel] (shifted by -2)
 
+    uint8_t _chordNudges[2] = {0};               // [horizontal/vertical]
+    uint8_t _noteNudges[NB_CHANNELS][2] = {{0}}; // [channel][horizontal/vertical]
+    uint8_t _trigNudges[NB_CHANNELS] = {0};      // [channel]
+    uint8_t _nudgeBuffer[32];                    // buffer used when applying nudges
+
     uint8_t _notesToPlay[NB_NOTES_PER_CHORD]; // buffer for notes to be played
 
     uint8_t getTrig(uint8_t step);
@@ -44,6 +49,12 @@ public:
     void setChordSelected(uint8_t step, uint8_t chordSelectionId);
     void setNoteSelected(uint8_t step, uint8_t channel, uint8_t noteSelectionId, bool state);
     void setTranspose(uint8_t channel, uint8_t octave);
+    
+    void setChordNudge(uint8_t amount, bool horizontal);
+    void setNotesNudge(uint8_t channel, uint8_t amount, bool horizontal);
+    void setTrigNudge(uint8_t channel, uint8_t amount);
+    void applyAllNudges();
+    void resetAllNudges();
 
     void reset(bool soft);
 };

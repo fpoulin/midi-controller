@@ -55,8 +55,8 @@ void Gui::moveCursorX(uint8_t n)
 
 void Gui::moveCursorY(uint8_t n)
 {
-    redrawAt(_cursorY);
-    _cursorY = n;
+    redrawAt(15 - n);
+    _cursorY = 15 - n;
 }
 
 void Gui::clickCursor()
@@ -106,6 +106,54 @@ void Gui::clickCursor()
         _state.setTrig(_cursorX, 1, !current);
         break;
     }
+}
+
+void Gui::nudge(uint8_t amount, bool horizontal)
+{
+    switch (_cursorY)
+    {
+    // 0-3 -> chords
+    case 0:
+    case 1:
+    case 2:
+    case 3:
+        _state.setChordNudge(amount, horizontal);
+        break;
+
+    // 5-8 -> channel 1 note selections
+    case 5:
+    case 6:
+    case 7:
+    case 8:
+        _state.setNotesNudge(0, amount, horizontal);
+        break;
+
+    // 9 -> channel 1 trigs
+    case 9:
+        if (horizontal)
+        {
+            _state.setTrigNudge(0, amount);
+        }
+        break;
+
+    // 10-13 -> channel 2 note selections
+    case 10:
+    case 11:
+    case 12:
+    case 13:
+        _state.setNotesNudge(1, amount, horizontal);
+        break;
+
+    // 14 -> channel 2 trigs
+    case 14:
+    if (horizontal)
+        {
+            _state.setTrigNudge(1, amount);
+        }
+        break;
+    }
+
+    redrawAt(_cursorY);
 }
 
 void Gui::redrawAt(uint8_t y)

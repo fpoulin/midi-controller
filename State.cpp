@@ -34,32 +34,51 @@ uint8_t State::getBar(uint8_t step)
 
 uint8_t State::hasTrigOn(uint8_t step, uint8_t channel)
 {
-    return _trigs[channel][getBar(step) % NB_NOTES_BARS][getTrig(step)];
+    uint8_t shifted = step >= _trigNudges[channel]
+        ? step - _trigNudges[channel]
+        : step + 32 - _trigNudges[channel];
+
+    return _trigs[channel][getBar(shifted) % NB_NOTES_BARS][getTrig(shifted)];
 }
 
 bool State::isChordSelected(uint8_t step, uint8_t channel, uint8_t chordSelectionId)
 {
-    return _chordSel[channel][getBar(step) % NB_CHORD_BARS][getBeat(step)] == chordSelectionId;
+    uint8_t shiftedChord = step >= _chordNudges[0] * NB_CHORDS_PER_BAR
+        ? step - _chordNudges[0] * NB_CHORDS_PER_BAR
+        : step + 128 - _chordNudges[0] * NB_CHORDS_PER_BAR;
+
+    uint8_t chordSel = _chordSel[channel][getBar(shiftedChord) % NB_CHORD_BARS][getBeat(shiftedChord)];
+    uint8_t shiftedChordSel = (chordSel + _chordNudges[1]) % NB_CHORDS;
+
+    return shiftedChordSel == chordSelectionId;
 }
 
 bool State::isNoteSelected(uint8_t step, uint8_t channel, uint8_t noteSelectionId)
 {
-    uint8_t notesSel = _notesSel[channel][getBar(step) % NB_NOTES_BARS][getTrig(step)];
+    uint8_t shifted = step >= _noteNudges[channel][0]
+        ? step - _noteNudges[channel][0]
+        : step + 32 - _noteNudges[channel][0];
+
+    uint8_t notesSel = _notesSel[channel][getBar(shifted) % NB_NOTES_BARS][getTrig(shifted)];
 
     // bitmap -> first X bits are the notes selected within the chord
-    return _notesToPlay[noteSelectionId] = ((128 >> noteSelectionId) & notesSel) != 0;
+    return _notesToPlay[noteSelectionId] = ((128 >> (noteSelectionId + NB_NOTES_PER_CHORD - _noteNudges[channel][1]) % NB_NOTES_PER_CHORD) & notesSel) != 0;
 }
 
 uint8_t *State::getNotes(uint8_t step, uint8_t channel)
 {
-    uint8_t choordSel = _chordSel[channel][getBar(step) % NB_CHORD_BARS][getBeat(step)];
+    uint8_t shiftedChord = step > _chordNudges[0] * NB_CHORDS_PER_BAR
+        ? step - _chordNudges[0] * NB_CHORDS_PER_BAR
+        : step + 128 - _chordNudges[0] * NB_CHORDS_PER_BAR;
+
+    uint8_t chordSel = _chordSel[channel][getBar(shiftedChord) % NB_CHORD_BARS][getBeat(shiftedChord)];
+    uint8_t shiftedChordSel = (chordSel + _chordNudges[1]) % NB_CHORDS;
 
     for (uint8_t i = 0; i < NB_NOTES_PER_CHORD; i++)
     {
-        _notesToPlay[i] =
-            isNoteSelected(step, channel, i)
-                ? _chords[choordSel][i] + (_transpose[channel] - 2) * 12
-                : 0;
+        _notesToPlay[i] = isNoteSelected(step, channel, i)
+            ? _chords[shiftedChordSel][i] + (_transpose[channel] - 2) * 12
+            : 0;
     }
 
     return _notesToPlay;
@@ -104,6 +123,99 @@ void State::setNoteSelected(uint8_t step, uint8_t channel, uint8_t noteSelection
 void State::setTranspose(uint8_t channel, uint8_t octave)
 {
     _transpose[channel] = octave;
+}
+
+void State::setChordNudge(uint8_t amount, bool horizontal)
+{
+    _chordNudges[horizontal ? 0 : 1] = amount;
+}
+
+void State::setNotesNudge(uint8_t channel, uint8_t amount, bool horizontal)
+{
+    _noteNudges[channel][horizontal ? 0 : 1] = amount;
+}
+
+void State::setTrigNudge(uint8_t channel, uint8_t amount)
+{
+    _trigNudges[channel] = amount;
+}
+
+void State::applyAllNudges()
+{
+    uint8_t shiftedIndex;
+    uint8_t *ptr;
+
+    // chords
+    if(_chordNudges[0] != 0 || _chordNudges[1] != 0)
+    {
+        for (uint8_t i = 0; i < 32; i++)
+        {
+            ptr = &_chordSel[0][getBar(i * 4) % NB_CHORD_BARS][getBeat(i * 4)];
+            _nudgeBuffer[i] = *ptr;
+
+            // read forward as long as possible, then read from buffer
+            shiftedIndex = (i + 32 - _chordNudges[0]) % 32;
+            *ptr = i + _chordNudges[0] < 32
+                ? _chordSel[0][getBar(shiftedIndex * 4) % NB_CHORD_BARS][getBeat(shiftedIndex * 4)]
+                : _nudgeBuffer[i - (32 - _chordNudges[0])];
+
+            *ptr = (*ptr + _chordNudges[1]) % NB_CHORDS;
+        }
+    }
+
+    // channels
+    for (uint8_t channel = 0; channel < NB_CHANNELS; channel++)
+    {
+        // notes
+        if(_noteNudges[channel][0] != 0 || _noteNudges[channel][1] != 0)
+        {
+            for (uint8_t i = 0; i < 32; i++)
+            {
+                ptr = &_notesSel[channel][getBar(i) % NB_NOTES_BARS][getTrig(i)];
+                _nudgeBuffer[i] = *ptr;
+
+                // read forward as long as possible, then read from buffer
+                shiftedIndex = (i + 32 - _noteNudges[channel][0]) % 32;
+                *ptr = i + _noteNudges[channel][0] < 32
+                    ? _notesSel[channel][getBar(shiftedIndex) % NB_NOTES_BARS][getTrig(shiftedIndex)]
+                    : _nudgeBuffer[i - (32 - _noteNudges[channel][0])];
+
+                // ex: for 10010000, nudge = 2: (00100100 | 01000000) & 11110000 = 01100000
+                *ptr = (*ptr >> _noteNudges[channel][1] | *ptr << (4 - _noteNudges[channel][1])) & B11110000;
+            }
+        }
+        
+        // trigs
+        if(_trigNudges[channel] != 0) 
+        {
+            for (uint8_t i = 0; i < 32; i++)
+            {
+                ptr = &_trigs[channel][getBar(i) % NB_NOTES_BARS][getTrig(i)];
+                _nudgeBuffer[i] = *ptr;
+
+                // read forward as long as possible, then read from buffer
+                shiftedIndex = (i + 32 - _trigNudges[channel]) % 32;
+                *ptr = i + _trigNudges[channel] < 32
+                    ? _trigs[channel][getBar(shiftedIndex) % NB_NOTES_BARS][getTrig(shiftedIndex)]
+                    : _nudgeBuffer[i - (32 - _trigNudges[channel])];
+            }
+        }
+    }
+
+    resetAllNudges();
+}
+
+void State::resetAllNudges() {
+
+    _chordNudges[0] = 0;
+    _chordNudges[1] = 0;
+
+    for (uint8_t i = 0; i < NB_CHANNELS; i++)
+    {
+        _noteNudges[i][0] = 0;
+        _noteNudges[i][1] = 0;
+        _trigNudges[i] = 0;
+    }
 }
 
 void State::reset(bool soft)

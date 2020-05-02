@@ -12,6 +12,8 @@ ModesManager::ModesManager(Gui &gui, State &state, Storage &storage, Controls &c
     , _cursorY(PotHandlerCursorY(gui))
     , _transpose1(PotHandlerTranspose(0, state))
     , _transpose2(PotHandlerTranspose(1, state))
+    , _nudgeH(PotHandlerNudge(gui, 31, true))
+    , _nudgeV(PotHandlerNudge(gui, 3, false))
     {
         _controls.btn1.setCallback(*this);
         _mode = NB_MODES - 1;
@@ -40,8 +42,8 @@ void ModesManager::onClick()
         _controls.btn3.setCallback(_fa);
         _controls.pot1.setCallback(_cursorY);
         _controls.pot2.setCallback(_fa);
-        _controls.pot3.setCallback(_fa);
-        _controls.pot4.setCallback(_fa);
+        _controls.pot3.setCallback(_nudgeH);
+        _controls.pot4.setCallback(_nudgeV);
         break;
 
     case 2: // randomize
