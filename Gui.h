@@ -30,6 +30,6 @@ public:
     void moveCursorY(uint8_t n);
     void clickCursor();
     void switchMode(uint8_t mode);
-    void onSplashEnd();
+    void onSplashEnd() override;
     void reset();
 };

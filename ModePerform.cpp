@@ -1,24 +1,10 @@
 #include "ModePerform.h"
 
-ModePerform::ModePerform(Controls &controls, Gui &gui, State &state)
-    : Mode(controls), _cursorY(gui), _cursorX(gui), _transpose1(0, state), _transpose2(1, state) {}
-
-PotHandler &ModePerform::getPotHandler1()
-{
-    return _cursorY;
-}
-
-PotHandler &ModePerform::getPotHandler2()
-{
-    return _cursorX;
-}
-
-PotHandler &ModePerform::getPotHandler3()
-{
-    return _transpose1;
-}
-
-PotHandler &ModePerform::getPotHandler4()
-{
-    return _transpose2;
-}
+ModePerform::ModePerform(Controls &controls, Gui &gui, State &state, BtnHandlerMode &switchMode, FaHandler &fa)
+    : Mode(controls, switchMode, fa, fa, _cursorY, _cursorX, _transpose1, _transpose2)
+    , _switchMode(switchMode)
+    , _fa(fa)
+    , _cursorX(PotHandlerCursorX(gui))
+    , _cursorY(PotHandlerCursorY(gui))
+    , _transpose1(PotHandlerTranspose(0, state))
+    , _transpose2(PotHandlerTranspose(1, state)) {}

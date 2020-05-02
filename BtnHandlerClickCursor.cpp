@@ -1,8 +1,8 @@
 #include "BtnHandlerClickCursor.h"
 
-BtnHandlerClickCursor::BtnHandlerClickCursor() {}
+BtnHandlerClickCursor::BtnHandlerClickCursor(Gui &gui) : _gui(gui) {}
 
 void BtnHandlerClickCursor::onClick()
 {
-    //_gui.clickCursor();
+    _gui.clickCursor();
 }

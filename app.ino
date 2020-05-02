@@ -7,15 +7,17 @@
 #include "Controls.h"
 #include "PushButton.h"
 #include "ModePerform.h"
+#include "FaHandler.h"
+#include "BtnHandlerMode.h"
 
 State _state;
 Storage _storage(_state);
 Gui _gui(_state);
 SyncPulse _syncPulse;
 Controls _controls;
-ModePerform _modePerform(_controls, _gui, _state);
-
-uint8_t _mode = 0;
+FaHandler _wanker;
+BtnHandlerMode _switchMode(_gui);
+ModePerform _modePerform(_controls, _gui, _state, _switchMode, _wanker);
 
 void playStep(uint8_t step, void (*sendNote)(uint8_t channel, uint8_t *notes));
 void addChord(uint8_t *chord);

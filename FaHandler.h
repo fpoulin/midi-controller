@@ -7,6 +7,6 @@ class FaHandler : public BtnHandler, public PotHandler
 {
 public:
     FaHandler();
-    virtual void onClick();
-    virtual void onChange(uint8_t oldValue, uint8_t newValue);
+    void onClick() override;
+    void onChange(uint8_t oldValue, uint8_t newValue) override;
 };

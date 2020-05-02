@@ -11,5 +11,5 @@ private:
 
 public:
     PotHandlerTranspose(uint8_t channel, State &state);
-    virtual void onChange(uint8_t oldValue, uint8_t newValue);
+    void onChange(uint8_t oldValue, uint8_t newValue) override;
 };
