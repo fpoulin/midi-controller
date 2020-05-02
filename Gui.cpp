@@ -161,6 +161,7 @@ void Gui::switchMode(uint8_t mode)
     _splash.play(mode, *this);
 }
 
+// callback invoked at end of splash screen animation
 void Gui::onSplashEnd()
 {
     redrawChords();

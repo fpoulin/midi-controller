@@ -1,7 +1,6 @@
 #pragma once
 
 #include "Controls.h"
-#include "PotHandlerFa.h"
 
 class Mode
 {

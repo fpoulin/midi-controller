@@ -12,7 +12,7 @@ void Potentiometer::peek()
     if(_callback == NULL) return;
 
     int raw = ravg(analogRead(_pin));
-    uint8_t mapped = map(raw, 0, 1024, _callback->getMin(), _callback->getMax() + 1);
+    uint8_t mapped = map(raw, 0, 1024, _callback->minValue, _callback->maxValue + 1);
     if (mapped != _value)
     {
         _callback->onChange(_value, mapped);

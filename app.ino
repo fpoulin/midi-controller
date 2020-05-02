@@ -12,11 +12,7 @@ State _state;
 Storage _storage(_state);
 Gui _gui(_state);
 SyncPulse _syncPulse;
-PushButton _btn1(PIN2);
-PushButton _btn2(PIN3);
-PushButton _btn3(PIN4);
-
-Controls _controls(_btn1, _btn2, _btn3);
+Controls _controls;
 ModePerform _modePerform(_controls, _gui, _state);
 
 uint8_t _mode = 0;
@@ -24,9 +20,6 @@ uint8_t _mode = 0;
 void playStep(uint8_t step, void (*sendNote)(uint8_t channel, uint8_t *notes));
 void addChord(uint8_t *chord);
 void stop();
-void handleBtn1();
-void handleBtn2();
-void handleBtn3();
 
 void setup()
 {
@@ -34,10 +27,6 @@ void setup()
 
     _storage.restoreState();
     _syncPulse.setup();
-
-    _controls.setHandleBtn1(handleBtn1);
-    _controls.setHandleBtn2(handleBtn2);
-    _controls.setHandleBtn3(handleBtn3);
     _modePerform.Activate();
 }
 
@@ -77,22 +66,4 @@ void stop()
     _state.reset(true);
     _gui.reset();
     _syncPulse.reset();
-}
-
-void handleBtn1()
-{
-    _mode++;
-    _mode = _mode% 8;
-    _gui.switchMode(_mode);
-}
-
-void handleBtn2()
-{
-    _gui.clickCursor();
-}
-
-void handleBtn3()
-{
-    _storage.writeState();
-    _gui.reset();
 }

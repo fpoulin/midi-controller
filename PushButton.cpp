@@ -10,6 +10,8 @@ PushButton::PushButton(uint8_t pin) : _pin(pin)
 
 void PushButton::peek()
 {
+    if (_callback == NULL) return;
+
     if (digitalRead(_pin) == LOW)
     {
         if (!_clicking)
@@ -19,7 +21,7 @@ void PushButton::peek()
             {
                 _clicking = true;
                 _lastClick = time;
-                _onClick();
+                _callback->onClick();
             }
         }
     }
@@ -29,7 +31,7 @@ void PushButton::peek()
     }
 }
 
-void PushButton::setCallback(void (*onClick)(void))
+void PushButton::setCallback(BtnHandler &callback)
 {
-    _onClick = onClick;
+    _callback = &callback;
 }

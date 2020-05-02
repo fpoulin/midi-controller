@@ -1,6 +1,7 @@
 #pragma once
 
 #include <Arduino.h>
+#include "BtnHandler.h"
 
 class PushButton
 {
@@ -8,9 +9,9 @@ private:
     uint8_t _pin;
     unsigned long _lastClick = 0;
     bool _clicking = false;
-    void (*_onClick)(void) = NULL;
+    BtnHandler *_callback = NULL;
 public:
     PushButton(uint8_t pin);
     void peek();
-    void setCallback(void (*onClick)(void));
+    void setCallback(BtnHandler &callback);
 };
