@@ -17,6 +17,7 @@ class ModesManager : public BtnHandler
 {
 private:
     Gui &_gui;
+    State &_state;
     Controls &_controls;
 
     FaHandler _fa;

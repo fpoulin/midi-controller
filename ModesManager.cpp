@@ -4,6 +4,7 @@
 
 ModesManager::ModesManager(Gui &gui, State &state, Storage &storage, Controls &controls)
     : _gui(gui)
+    , _state(state)
     , _controls(controls)
     , _fa(FaHandler())
     , _clickCursor(BtnHandlerClickCursor(gui))
@@ -36,6 +37,7 @@ void ModesManager::switchToMode(uint8_t mode)
 {
     _mode = mode;
     _gui.switchMode(_mode);
+    _state.resetAllNudges();
 
     switch (_mode)
     {
@@ -88,7 +90,7 @@ void ModesManager::switchToMode(uint8_t mode)
         _controls.btn2.setCallback(_fa);
         _controls.btn3.setCallback(_fa);
         _controls.pot1.setCallback(_cursorY);
-        _controls.pot2.setCallback(_fa);
+        _controls.pot2.setCallback(_cursorX);
         _controls.pot3.setCallback(_fa);
         _controls.pot4.setCallback(_fa);
         break;
