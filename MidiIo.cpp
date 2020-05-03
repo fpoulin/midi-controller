@@ -22,9 +22,10 @@ uint8_t _step = 0;
 uint8_t _lastNotes[NB_CHANNELS][MAX_CHORD_NOTES]; // [channel][note]
 
 uint8_t _nbKeyPressed = 0;
+uint8_t _nbNotesToSend = 0;
 uint8_t _chord[MAX_CHORD_NOTES];
 boolean _yieldChord = false;
-uint8_t _yieldAt = 0;
+uint8_t _yieldAtMinimum = 0;
 
 void (*_onStep)(uint8_t step, void (*sendNote)(uint8_t channel, uint8_t *notes));
 void (*_onChord)(uint8_t *chord, uint8_t nbNotes);
@@ -105,19 +106,20 @@ void handleStop()
     reset();
 }
 
-void setChordYieldSize(uint8_t yieldSize)
+void setChordYieldMinimum(uint8_t yieldSize)
 {
-    _yieldAt = min(yieldSize, MAX_CHORD_NOTES);
+    _yieldAtMinimum = min(yieldSize, MAX_CHORD_NOTES);
 }
 
 void handleNoteOn(byte channel, byte note, byte velocity)
 {
-    if(_yieldAt == 0) return;
+    if(_yieldAtMinimum == 0) return;
 
     if (_nbKeyPressed < MAX_CHORD_NOTES)
     {
         _chord[_nbKeyPressed++] = note;
-        if (_nbKeyPressed == _yieldAt)
+        _nbNotesToSend = max(_nbNotesToSend, _nbKeyPressed);
+        if (_nbKeyPressed >= _yieldAtMinimum)
         {
             _yieldChord = true;
         }
@@ -126,12 +128,13 @@ void handleNoteOn(byte channel, byte note, byte velocity)
 
 void handleNoteOff(byte channel, byte note, byte velocity)
 {
-    if(_yieldAt == 0) return;
+    if(_yieldAtMinimum == 0) return;
 
     if (!--_nbKeyPressed && _yieldChord)
     {
         _yieldChord = false;
-        _onChord(_chord, _yieldAt);
+        _onChord(_chord, _nbNotesToSend);
+        _nbNotesToSend = 0;
     }
 }
 

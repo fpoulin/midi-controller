@@ -231,24 +231,24 @@ void State::setHandleChordMode(uint8_t mode)
     {
     // setup 'store chord' mode
     case 1:
-        midiIo::setChordYieldSize(4);
+        midiIo::setChordYieldMinimum(4);
         resetChordInputId();
         break;
     
     // setup 'set ref notes' mode
     case 2:
-        midiIo::setChordYieldSize(4);
+        midiIo::setChordYieldMinimum(4);
         break;
 
     // setup 'step edit' mode
     case 3:
-        midiIo::setChordYieldSize(1);
+        midiIo::setChordYieldMinimum(1);
         _stepEditAtStep = 0;
         break;
 
     // otherwise just silence the MIDI in
     default:
-        midiIo::setChordYieldSize(0);
+        midiIo::setChordYieldMinimum(0);
         break;
     }
 }
@@ -298,8 +298,11 @@ void State::handleChord(uint8_t *chord, uint8_t nbNotes, uint8_t destination)
                 bitmap = 0;
                 for (uint8_t i = 0; i < NB_NOTES_PER_CHORD; i++)
                 {
-                    if(_refNotes[i] == chord[0]) {
-                        bitmap = 128 >> i | bitmap;
+                    for(uint8_t j = 0; j < nbNotes; j++)
+                    {
+                        if(_refNotes[i] == chord[j]) {
+                            bitmap = 128 >> i | bitmap;
+                        }
                     }
                 }
                 _notesSel[0][getBar(_stepEditAtStep) % NB_NOTES_BARS][getTrig(_stepEditAtStep)] = bitmap;
@@ -320,8 +323,11 @@ void State::handleChord(uint8_t *chord, uint8_t nbNotes, uint8_t destination)
                 bitmap = 0;
                 for (uint8_t i = 0; i < NB_NOTES_PER_CHORD; i++)
                 {
-                    if(_refNotes[i] == chord[0]) {
-                        bitmap = 128 >> i | bitmap;
+                    for(uint8_t j = 0; j < nbNotes; j++)
+                    {
+                        if(_refNotes[i] == chord[j]) {
+                            bitmap = 128 >> i | bitmap;
+                        }
                     }
                 }
                 _notesSel[1][getBar(_stepEditAtStep) % NB_NOTES_BARS][getTrig(_stepEditAtStep)] = bitmap;

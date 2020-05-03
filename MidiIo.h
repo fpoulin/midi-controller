@@ -15,6 +15,6 @@ void init(
 
 void loop();
 
-void setChordYieldSize(uint8_t yieldSize);
+void setChordYieldMinimum(uint8_t yieldSize);
 
 END_MIDI_IO_NAMESPACE
