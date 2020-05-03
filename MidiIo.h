@@ -10,9 +10,11 @@ BEGIN_MIDI_IO_NAMESPACE
 
 void init(
     void (*onStep)(uint8_t step, void (*sendNote)(uint8_t channel, uint8_t *notes)),
-    void (*onNote)(uint8_t* chord),
+    void (*onNote)(uint8_t* chord, uint8_t nbNotes),
     void (*onStop)(void));
 
 void loop();
+
+void setChordYieldSize(uint8_t yieldSize);
 
 END_MIDI_IO_NAMESPACE

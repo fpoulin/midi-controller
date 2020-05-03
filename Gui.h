@@ -19,6 +19,8 @@ private:
     unsigned long _lastBlink = 0;
     unsigned long _lastRepaint = 0;
 
+    uint8_t getStateDestination(); // 0:chords, 1: ch1 notes, 2:ch1 trigs, 3: ch2 notes, 4: ch2 trigs, 42: unmapped
+
 public:
     Gui(State &state);
     void loop();
@@ -33,7 +35,9 @@ public:
     void moveCursorY(uint8_t n);
     void clickCursor();
 
-    void nudge(uint8_t amount, bool horizontal);
     void switchMode(uint8_t mode);
     void onSplashEnd() override;
+
+    void nudge(uint8_t amount, bool horizontal);
+    void handleChordIn(uint8_t *chord, uint8_t nbNotes);
 };

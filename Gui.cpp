@@ -47,131 +47,6 @@ void Gui::renderStep(uint8_t step)
     _screen.setPixel((step + 31) % 32, 15, false);
 }
 
-void Gui::moveCursorX(uint8_t n)
-{
-    redrawAt(_cursorY);
-    _cursorX = n;
-}
-
-void Gui::moveCursorY(uint8_t n)
-{
-    redrawAt(15 - n);
-    _cursorY = 15 - n;
-}
-
-void Gui::clickCursor()
-{
-    uint8_t selectionId;
-    bool current;
-
-    switch ((int)_cursorY)
-    {
-    // 0-3 -> chords
-    case 0:
-    case 1:
-    case 2:
-    case 3:
-        _state.setChordSelected(_cursorX * 4, (3 - _cursorY));
-        break;
-
-    // 5-8 -> channel 1 note selections
-    case 5:
-    case 6:
-    case 7:
-    case 8:
-        selectionId = 3 - (_cursorY - 5);
-        current = _state.isNoteSelected(_cursorX, 0, selectionId);
-        _state.setNoteSelected(_cursorX, 0, selectionId, !current);
-        break;
-
-    // 9 -> channel 1 trigs
-    case 9:
-        current = _state.hasTrigOn(_cursorX, 0);
-        _state.setTrig(_cursorX, 0, !current);
-        break;
-
-    // 10-13 -> channel 2 note selections
-    case 10:
-    case 11:
-    case 12:
-    case 13:
-        selectionId = 3 - (_cursorY - 10);
-        current = _state.isNoteSelected(_cursorX, 1, selectionId);
-        _state.setNoteSelected(_cursorX, 1, selectionId, !current);
-        break;
-
-    // 14 -> channel 2 trigs
-    case 14:
-        current = _state.hasTrigOn(_cursorX, 1);
-        _state.setTrig(_cursorX, 1, !current);
-        break;
-    }
-}
-
-void Gui::nudge(uint8_t amount, bool horizontal)
-{
-    switch (_cursorY)
-    {
-    // 0-3 -> chords
-    case 0:
-    case 1:
-    case 2:
-    case 3:
-        _state.setChordNudge(amount, horizontal);
-        break;
-
-    // 5-8 -> channel 1 note selections
-    case 5:
-    case 6:
-    case 7:
-    case 8:
-        _state.setNotesNudge(0, amount, horizontal);
-        break;
-
-    // 9 -> channel 1 trigs
-    case 9:
-        if (horizontal)
-        {
-            _state.setTrigNudge(0, amount);
-        }
-        break;
-
-    // 10-13 -> channel 2 note selections
-    case 10:
-    case 11:
-    case 12:
-    case 13:
-        _state.setNotesNudge(1, amount, horizontal);
-        break;
-
-    // 14 -> channel 2 trigs
-    case 14:
-    if (horizontal)
-        {
-            _state.setTrigNudge(1, amount);
-        }
-        break;
-    }
-
-    redrawAt(_cursorY);
-}
-
-void Gui::redrawAt(uint8_t y)
-{
-    if (y < 5)
-    {
-        redrawChords();
-    }
-    else if (y < 10)
-    {
-        redrawChannel(0);
-    }
-    else
-    {
-        redrawChannel(1);
-    }
-}
-
 void Gui::redrawChords()
 {
     // iterate over 8 bars (chords sequence loop)
@@ -203,6 +78,29 @@ void Gui::redrawChannel(uint8_t channel)
     }
 }
 
+void Gui::redrawAt(uint8_t y)
+{
+    switch (getStateDestination())
+    {
+    // chords
+    case 0:
+        redrawChords();
+        break;
+
+    // channel 1 note selections / trigs
+    case 1:
+    case 2:
+        redrawChannel(0);
+        break;
+
+    // channel 2 note selections / trigs
+    case 3:
+    case 4:
+        redrawChannel(1);
+        break;
+    }
+}
+
 void Gui::redraw(bool resetScreen)
 {
     if(resetScreen) 
@@ -215,6 +113,59 @@ void Gui::redraw(bool resetScreen)
     redrawChannel(1);
 }
 
+void Gui::moveCursorX(uint8_t n)
+{
+    redrawAt(_cursorY);
+    _cursorX = n;
+    _state.setStepEditAtStep(_cursorX);
+}
+
+void Gui::moveCursorY(uint8_t n)
+{
+    redrawAt(15 - n);
+    _cursorY = 15 - n;
+}
+
+void Gui::clickCursor()
+{
+    uint8_t selectionId;
+    bool current;
+
+    switch (getStateDestination())
+    {
+    // chords (assuming cursorY is 0-3)
+    case 0:
+        _state.setChordSelected(_cursorX * 4, (3 - _cursorY));
+        break;
+
+    //channel 1 notes (assuming cursorY is 5-8)
+    case 1:
+        selectionId = 3 - (_cursorY - 5);
+        current = _state.isNoteSelected(_cursorX, 0, selectionId);
+        _state.setNoteSelected(_cursorX, 0, selectionId, !current);
+        break;
+
+    // channel 1 trigs
+    case 2:
+        current = _state.hasTrigOn(_cursorX, 0);
+        _state.setTrig(_cursorX, 0, !current);
+        break;
+
+    // channel 2 notes (assuming cursorY is 10-13)
+    case 3:
+        selectionId = 3 - (_cursorY - 10);
+        current = _state.isNoteSelected(_cursorX, 1, selectionId);
+        _state.setNoteSelected(_cursorX, 1, selectionId, !current);
+        break;
+
+    // channel 2 trigs
+    case 4:
+        current = _state.hasTrigOn(_cursorX, 1);
+        _state.setTrig(_cursorX, 1, !current);
+        break;
+    }
+}
+
 void Gui::switchMode(uint8_t mode)
 {
     _mode = mode;
@@ -225,4 +176,87 @@ void Gui::switchMode(uint8_t mode)
 void Gui::onSplashEnd()
 {
     redrawChords();
+}
+
+void Gui::nudge(uint8_t amount, bool horizontal)
+{
+    switch (getStateDestination())
+    {
+    // chords
+    case 0:
+        _state.setChordNudge(amount, horizontal);
+        break;
+
+    // channel 1 notes
+    case 1:
+        _state.setNotesNudge(0, amount, horizontal);
+        break;
+
+    // channel 1 trigs
+    case 2:
+        if (horizontal)
+        {
+            _state.setTrigNudge(0, amount);
+        }
+        break;
+
+    // channel 2 notes
+    case 3:
+        _state.setNotesNudge(1, amount, horizontal);
+        break;
+
+    // channel 2 trigs
+    case 4:
+        if (horizontal)
+        {
+            _state.setTrigNudge(1, amount);
+        }
+        break;
+    }
+
+    redrawAt(_cursorY);
+}
+
+void Gui::handleChordIn(uint8_t *chord, uint8_t nbNotes)
+{
+    _state.handleChord(chord, nbNotes, getStateDestination());
+}
+
+uint8_t Gui::getStateDestination()
+{
+    switch (_cursorY)
+    {
+    // 0-3 -> chords
+    case 0:
+    case 1:
+    case 2:
+    case 3:
+        return 0;
+
+    // 5-8 -> channel 1 note selections
+    case 5:
+    case 6:
+    case 7:
+    case 8:
+        return 1;
+
+    // 9 -> channel 1 trigs
+    case 9:
+        return 2;
+
+    // 10-13 -> channel 2 note selections
+    case 10:
+    case 11:
+    case 12:
+    case 13:
+        return 3;
+
+    // 14 -> channel 2 trigs
+    case 14:
+        return 4;
+
+    // unmapped
+    default:
+        return 42;
+    }
 }

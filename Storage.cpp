@@ -23,14 +23,11 @@ void Storage::writeState()
     }
 
     // chord selections
-    for (uint8_t c = 0; c < NB_CHANNELS; c++)
+    for (uint8_t i = 0; i < NB_CHORD_BARS; i++)
     {
-        for (uint8_t i = 0; i < NB_CHORD_BARS; i++)
+        for (uint8_t j = 0; j < NB_CHORDS_PER_BAR; j++)
         {
-            for (uint8_t j = 0; j < NB_CHORDS_PER_BAR; j++)
-            {
-                EEPROM.update(idx++, _state._chordSel[c][i][j]);
-            }
+            EEPROM.update(idx++, _state._chordSel[i][j]);
         }
     }
 
@@ -77,14 +74,11 @@ bool Storage::restoreState()
     }
 
     // chord selections
-    for (uint8_t c = 0; c < NB_CHANNELS; c++)
+    for (uint8_t i = 0; i < NB_CHORD_BARS; i++)
     {
-        for (uint8_t i = 0; i < NB_CHORD_BARS; i++)
+        for (uint8_t j = 0; j < NB_CHORDS_PER_BAR; j++)
         {
-            for (uint8_t j = 0; j < NB_CHORDS_PER_BAR; j++)
-            {
-                _state._chordSel[c][i][j] = EEPROM.read(idx++);
-            }
+            _state._chordSel[i][j] = EEPROM.read(idx++);
         }
     }
 

@@ -1,6 +1,8 @@
 #include <MIDI.h>
 #include "MidiIo.h"
 
+#define NB_CHANNELS 2
+#define MAX_CHORD_NOTES 4
 #define MIDI_CHANNEL_IN 1
 
 BEGIN_MIDI_IO_NAMESPACE
@@ -17,19 +19,20 @@ midi::MidiInterface<HardwareSerial> MIDI((HardwareSerial &)Serial);
 boolean _playing = false;
 uint8_t _clock = 0;
 uint8_t _step = 0;
-uint8_t _lastNotes[2][4]; // [channel][note]
+uint8_t _lastNotes[NB_CHANNELS][MAX_CHORD_NOTES]; // [channel][note]
 
 uint8_t _nbKeyPressed = 0;
-uint8_t _chord[4];
-boolean _sendChord = false;
+uint8_t _chord[MAX_CHORD_NOTES];
+boolean _yieldChord = false;
+uint8_t _yieldAt = 0;
 
 void (*_onStep)(uint8_t step, void (*sendNote)(uint8_t channel, uint8_t *notes));
-void (*_onChord)(uint8_t *chord);
+void (*_onChord)(uint8_t *chord, uint8_t nbNotes);
 void (*_onStop)(void);
 
 void init(
     void (*onStep)(uint8_t step, void (*sendNote)(uint8_t channel, uint8_t *notes)),
-    void (*onChord)(uint8_t *chord),
+    void (*onChord)(uint8_t *chord, uint8_t nbNotes),
     void (*onStop)(void))
 {
     _onStep = onStep;
@@ -49,7 +52,7 @@ void init(
 
 void sendNotes(uint8_t channel, uint8_t *notes)
 {
-    for (uint8_t i = 0; i < 4; i++)
+    for (uint8_t i = 0; i < MAX_CHORD_NOTES; i++)
     {
         if (_lastNotes[channel][i] != 0)
         {
@@ -88,13 +91,13 @@ void handleStop()
 {
     _onStop();
 
-    for (uint8_t channel = 0; channel < 2; channel++)
+    for (uint8_t channel = 0; channel < NB_CHANNELS; channel++)
     {
-        for (uint8_t i = 0; i < 4; i++)
+        for (uint8_t i = 0; i < MAX_CHORD_NOTES; i++)
         {
             if (_lastNotes[channel][i] != 0)
             {
-                MIDI.sendNoteOn(_lastNotes[channel][i], 0, channel+1);
+                MIDI.sendNoteOn(_lastNotes[channel][i], 0, channel + 1);
             }
         }
     }
@@ -102,24 +105,33 @@ void handleStop()
     reset();
 }
 
+void setChordYieldSize(uint8_t yieldSize)
+{
+    _yieldAt = min(yieldSize, MAX_CHORD_NOTES);
+}
+
 void handleNoteOn(byte channel, byte note, byte velocity)
 {
-    if (_nbKeyPressed < 4)
+    if(_yieldAt == 0) return;
+
+    if (_nbKeyPressed < MAX_CHORD_NOTES)
     {
         _chord[_nbKeyPressed++] = note;
-        if (_nbKeyPressed == 4)
+        if (_nbKeyPressed == _yieldAt)
         {
-            _sendChord = true;
+            _yieldChord = true;
         }
     }
 }
 
 void handleNoteOff(byte channel, byte note, byte velocity)
 {
-    if (!--_nbKeyPressed && _sendChord)
+    if(_yieldAt == 0) return;
+
+    if (!--_nbKeyPressed && _yieldChord)
     {
-        _sendChord = false;
-        _onChord(_chord);
+        _yieldChord = false;
+        _onChord(_chord, _yieldAt);
     }
 }
 
@@ -129,12 +141,15 @@ void reset()
     _clock = 0;
     _step = 0;
     _nbKeyPressed = 0;
-    _sendChord = false;
+    _yieldChord = false;
 
-    for (uint8_t i = 0; i < 4; i++)
+    for (uint8_t i = 0; i < MAX_CHORD_NOTES; i++)
     {
-        _lastNotes[0][i] = 0;
-        _lastNotes[1][i] = 0;
+        for (uint8_t channel = 0; channel < NB_CHANNELS; channel++)
+        {
+            _lastNotes[channel][i] = 0;
+        }
+
         _chord[i] = 0;
     }
 }

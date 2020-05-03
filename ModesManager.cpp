@@ -42,6 +42,7 @@ void ModesManager::switchToMode(uint8_t mode)
     switch (_mode)
     {
     case 0: // perform
+        _state.setHandleChordMode(0);
         _controls.btn2.setCallback(_fa);
         _controls.btn3.setCallback(_fa);
         _controls.pot1.setCallback(_fa);
@@ -51,6 +52,7 @@ void ModesManager::switchToMode(uint8_t mode)
         break;
 
     case 1: // nudge
+        _state.setHandleChordMode(0);
         _controls.btn2.setCallback(_nudgeReset);
         _controls.btn3.setCallback(_nudgeApply);
         _controls.pot1.setCallback(_cursorY);
@@ -60,6 +62,7 @@ void ModesManager::switchToMode(uint8_t mode)
         break;
 
     case 2: // randomize
+        _state.setHandleChordMode(0);
         _controls.btn2.setCallback(_fa);
         _controls.btn3.setCallback(_fa);
         _controls.pot1.setCallback(_cursorY);
@@ -69,6 +72,7 @@ void ModesManager::switchToMode(uint8_t mode)
         break;
 
     case 3: // repeat
+        _state.setHandleChordMode(0);
         _controls.btn2.setCallback(_fa);
         _controls.btn3.setCallback(_fa);
         _controls.pot1.setCallback(_cursorY);
@@ -78,6 +82,7 @@ void ModesManager::switchToMode(uint8_t mode)
         break;
 
     case 4: // manual edit
+        _state.setHandleChordMode(0);
         _controls.btn2.setCallback(_clickCursor);
         _controls.btn3.setCallback(_saveEeprom);
         _controls.pot1.setCallback(_cursorY);
@@ -87,6 +92,7 @@ void ModesManager::switchToMode(uint8_t mode)
         break;
 
     case 5: // step sequence
+        _state.setHandleChordMode(2);
         _controls.btn2.setCallback(_fa);
         _controls.btn3.setCallback(_fa);
         _controls.pot1.setCallback(_cursorY);
@@ -96,6 +102,7 @@ void ModesManager::switchToMode(uint8_t mode)
         break;
 
     case 6: // chords
+        _state.setHandleChordMode(1);
         _controls.btn2.setCallback(_fa);
         _controls.btn3.setCallback(_fa);
         _controls.pot1.setCallback(_fa);
@@ -105,6 +112,7 @@ void ModesManager::switchToMode(uint8_t mode)
         break;
 
     case 7: // settings
+        _state.setHandleChordMode(0);
         _controls.btn2.setCallback(_fa);
         _controls.btn3.setCallback(_fa);
         _controls.pot1.setCallback(_fa);

@@ -15,12 +15,12 @@ Controls _controls;
 ModesManager _modes(_gui, _state, _storage, _controls);
 
 void playStep(uint8_t step, void (*sendNote)(uint8_t channel, uint8_t *notes));
-void addChord(uint8_t *chord);
+void handleChord(uint8_t *chord, uint8_t nbNotes);
 void stop();
 
 void setup()
 {
-    midiIo::init(playStep, addChord, stop);
+    midiIo::init(playStep, handleChord, stop);
     _syncPulse.setup();
 }
 
@@ -39,7 +39,7 @@ void playStep(uint8_t step, void (*sendNote)(uint8_t channel, uint8_t *notes))
         _syncPulse.sendPulse();
     }
 
-    for (uint8_t channel = 0; channel < 2; channel++)
+    for (uint8_t channel = 0; channel < NB_CHANNELS; channel++)
     {
         if (_state.hasTrigOn(step, channel) != 0)
         {
@@ -50,14 +50,14 @@ void playStep(uint8_t step, void (*sendNote)(uint8_t channel, uint8_t *notes))
     _gui.renderStep(step);
 }
 
-void addChord(uint8_t *chord)
+void handleChord(uint8_t *chord, uint8_t nbNotes)
 {
-    _state.addChord(chord);
+    _gui.handleChordIn(chord, nbNotes);
 }
 
 void stop()
 {
     _state.reset(true);
-    _gui.redraw(true);
     _syncPulse.reset();
+    _gui.redraw(true);
 }

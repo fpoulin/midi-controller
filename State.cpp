@@ -1,4 +1,5 @@
 #include "State.h"
+#include "MidiIo.h"
 
 State::State()
 {
@@ -47,7 +48,7 @@ bool State::isChordSelected(uint8_t step, uint8_t channel, uint8_t chordSelectio
         ? step - _chordNudges[0] * NB_CHORDS_PER_BAR
         : step + 128 - _chordNudges[0] * NB_CHORDS_PER_BAR;
 
-    uint8_t chordSel = _chordSel[channel][getBar(shiftedChord) % NB_CHORD_BARS][getBeat(shiftedChord)];
+    uint8_t chordSel = _chordSel[getBar(shiftedChord) % NB_CHORD_BARS][getBeat(shiftedChord)];
     uint8_t shiftedChordSel = (chordSel + _chordNudges[1]) % NB_CHORDS;
 
     return shiftedChordSel == chordSelectionId;
@@ -71,7 +72,7 @@ uint8_t *State::getNotes(uint8_t step, uint8_t channel)
         ? step - _chordNudges[0] * NB_CHORDS_PER_BAR
         : step + 128 - _chordNudges[0] * NB_CHORDS_PER_BAR;
 
-    uint8_t chordSel = _chordSel[channel][getBar(shiftedChord) % NB_CHORD_BARS][getBeat(shiftedChord)];
+    uint8_t chordSel = _chordSel[getBar(shiftedChord) % NB_CHORD_BARS][getBeat(shiftedChord)];
     uint8_t shiftedChordSel = (chordSel + _chordNudges[1]) % NB_CHORDS;
 
     for (uint8_t i = 0; i < NB_NOTES_PER_CHORD; i++)
@@ -84,15 +85,6 @@ uint8_t *State::getNotes(uint8_t step, uint8_t channel)
     return _notesToPlay;
 }
 
-void State::addChord(uint8_t *chord)
-{
-    for (uint8_t i = 0; i < NB_NOTES_PER_CHORD; i++)
-    {
-        _chords[_currChordInputId][i] = chord[i];
-    }
-    _currChordInputId = ++_currChordInputId % NB_NOTES_PER_CHORD;
-}
-
 void State::setTrig(uint8_t step, uint8_t channel, bool state)
 {
     // triggers on: [channel][bar%2][trig]
@@ -102,8 +94,7 @@ void State::setTrig(uint8_t step, uint8_t channel, bool state)
 void State::setChordSelected(uint8_t step, uint8_t chordSelectionId)
 {
     // selection of a chord: [channel][bar%8][beat]
-    _chordSel[0][getBar(step) % NB_CHORD_BARS][getBeat(step)] = chordSelectionId;
-    _chordSel[1][getBar(step) % NB_CHORD_BARS][getBeat(step)] = chordSelectionId;
+    _chordSel[getBar(step) % NB_CHORD_BARS][getBeat(step)] = chordSelectionId;
 }
 
 void State::setNoteSelected(uint8_t step, uint8_t channel, uint8_t noteSelectionId, bool state)
@@ -150,7 +141,7 @@ void State::applyAllNudges()
     {
         for (uint8_t i = 0; i < 32; i++)
         {
-            ptr = &_chordSel[0][getBar(i * 4) % NB_CHORD_BARS][getBeat(i * 4)];
+            ptr = &_chordSel[getBar(i * 4) % NB_CHORD_BARS][getBeat(i * 4)];
             _nudgeBuffer[i] = *ptr;
 
             shiftedIndex = i > _chordNudges[0]
@@ -159,7 +150,7 @@ void State::applyAllNudges()
 
             // read forward as long as possible, then read from buffer
             *ptr = i < _chordNudges[0]
-                ? _chordSel[0][getBar(shiftedIndex * 4) % NB_CHORD_BARS][getBeat(shiftedIndex * 4)]
+                ? _chordSel[getBar(shiftedIndex * 4) % NB_CHORD_BARS][getBeat(shiftedIndex * 4)]
                 : _nudgeBuffer[i - _chordNudges[0]];
 
             *ptr = (*ptr + _chordNudges[1]) % NB_CHORDS;
@@ -227,9 +218,141 @@ void State::resetAllNudges() {
     }
 }
 
-void State::reset(bool soft)
+void State::setHandleChordMode(uint8_t mode)
+{
+    _handleChordMode = mode;
+
+    switch (_handleChordMode)
+    {
+    // setup 'store chord' mode
+    case 1:
+        midiIo::setChordYieldSize(4);
+        resetChordInputId();
+        break;
+    
+    // setup 'set ref notes' mode
+    case 2:
+        midiIo::setChordYieldSize(4);
+        break;
+
+    // setup 'step edit' mode
+    case 3:
+        midiIo::setChordYieldSize(1);
+        _stepEditAtStep = 0;
+        break;
+
+    // otherwise just silence the MIDI in
+    default:
+        midiIo::setChordYieldSize(0);
+        break;
+    }
+}
+
+void State::handleChord(uint8_t *chord, uint8_t nbNotes, uint8_t destination)
+{
+    switch (_handleChordMode)
+    {
+    // store chord
+    case 1:
+        for (uint8_t i = 0; i < NB_NOTES_PER_CHORD; i++)
+        {
+            _chords[_currChordInputId][i] = chord[i];
+        }
+        _currChordInputId = ++_currChordInputId % NB_NOTES_PER_CHORD;
+        break;
+
+    // set ref notes (and switch to step edit)
+    case 2:
+        for (uint8_t i = 0; i < NB_NOTES_PER_CHORD; i++)
+        {
+            _refNotes[i] = chord[i];
+        }
+        setHandleChordMode(3);
+        break;
+
+    // step edit
+    case 3:
+        
+        uint8_t bitmap;
+        bool found;
+
+        switch(destination)
+        {
+            // chord selection
+            case 0:
+                for (uint8_t i = 0; i < NB_NOTES_PER_CHORD; i++)
+                {
+                    if(_refNotes[i] == chord[0]) {
+                        _chordSel[getBar(_stepEditAtStep * 4) % NB_CHORD_BARS][getBeat(_stepEditAtStep * 4)] = i;
+                    }
+                }
+                break;
+
+            // ch1 notes
+            case 1:
+                bitmap = 0;
+                for (uint8_t i = 0; i < NB_NOTES_PER_CHORD; i++)
+                {
+                    if(_refNotes[i] == chord[0]) {
+                        bitmap = 128 >> i | bitmap;
+                    }
+                }
+                _notesSel[0][getBar(_stepEditAtStep) % NB_NOTES_BARS][getTrig(_stepEditAtStep)] = bitmap;
+                break;
+
+            // ch1: trigs
+            case 2:
+                found = false;
+                for (uint8_t i = 0; i < NB_NOTES_PER_CHORD; i++)
+                {
+                    found |= _refNotes[i] == chord[0];
+                }
+                _trigs[0][getBar(_stepEditAtStep) % NB_NOTES_BARS][getTrig(_stepEditAtStep)] = found ? 127 : 0;
+                break;
+
+            // ch2 notes
+            case 3:
+                bitmap = 0;
+                for (uint8_t i = 0; i < NB_NOTES_PER_CHORD; i++)
+                {
+                    if(_refNotes[i] == chord[0]) {
+                        bitmap = 128 >> i | bitmap;
+                    }
+                }
+                _notesSel[1][getBar(_stepEditAtStep) % NB_NOTES_BARS][getTrig(_stepEditAtStep)] = bitmap;
+                break;
+
+            // ch2 trigs
+            case 4:
+                found = false;
+                for (uint8_t i = 0; i < NB_NOTES_PER_CHORD; i++)
+                {
+                    found |= _refNotes[i] == chord[0];
+                }
+                _trigs[1][getBar(_stepEditAtStep) % NB_NOTES_BARS][getTrig(_stepEditAtStep)] = found ? 127 : 0;
+                break;
+        }
+
+        // auto-move forward
+        _stepEditAtStep++;
+        _stepEditAtStep = _stepEditAtStep % 32;
+        break;
+    }
+}
+
+void State::resetChordInputId()
 {
     _currChordInputId = 0;
+}
+
+void State::setStepEditAtStep(uint8_t step)
+{
+    _stepEditAtStep = step;
+}
+
+void State::reset(bool soft)
+{
+    resetChordInputId();
 
     if (soft)
     {
@@ -243,8 +366,7 @@ void State::reset(bool soft)
     {
         for (uint8_t j = 0; j < NB_CHORDS_PER_BAR; j++)
         {
-            _chordSel[0][i][j] = i / 2;
-            _chordSel[1][i][j] = i / 2;
+            _chordSel[i][j] = i / 2;
         }
     }
 
