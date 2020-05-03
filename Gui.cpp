@@ -16,7 +16,7 @@ void Gui::loop()
 
     if ((now - _lastBlink) >= CURSOR_BLINK_RATE)
     {
-        _lastBlink = now;
+        _lastBlink = now;   
         _cursorBlinkState = !_cursorBlinkState;
     }
 
@@ -78,7 +78,7 @@ void Gui::redrawChannel(uint8_t channel)
     }
 }
 
-void Gui::redrawAt(uint8_t y)
+void Gui::redrawAtCursorY()
 {
     switch (getStateDestination())
     {
@@ -115,15 +115,15 @@ void Gui::redraw(bool resetScreen)
 
 void Gui::moveCursorX(uint8_t n)
 {
-    redrawAt(_cursorY);
+    redrawAtCursorY();
     _cursorX = n;
     _state.setStepEditAtStep(_cursorX);
 }
 
 void Gui::moveCursorY(uint8_t n)
 {
-    redrawAt(15 - n);
     _cursorY = 15 - n;
+    redrawAtCursorY();
 }
 
 void Gui::clickCursor()
@@ -214,12 +214,13 @@ void Gui::nudge(uint8_t amount, bool horizontal)
         break;
     }
 
-    redrawAt(_cursorY);
+    redrawAtCursorY();
 }
 
 void Gui::handleChordIn(uint8_t *chord, uint8_t nbNotes)
 {
     _state.handleChord(chord, nbNotes, getStateDestination());
+    redrawAtCursorY();
 }
 
 uint8_t Gui::getStateDestination()

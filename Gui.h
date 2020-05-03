@@ -28,7 +28,7 @@ public:
     void renderStep(uint8_t step);
     void redrawChords();
     void redrawChannel(uint8_t channel);
-    void redrawAt(uint8_t y);
+    void redrawAtCursorY();
     void redraw(bool resetScreen);
     
     void moveCursorX(uint8_t n);

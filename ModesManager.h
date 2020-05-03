@@ -7,6 +7,8 @@
 #include "FaHandler.h"
 #include "BtnHandlerClickCursor.h"
 #include "BtnHandlerNudgeAction.h"
+#include "BtnHandlerStepSequenceReset.h"
+#include "BtnHandlerChordsReset.h"
 #include "BtnHandlerSaveEeprom.h"
 #include "PotHandlerCursorX.h"
 #include "PotHandlerCursorY.h"
@@ -24,6 +26,8 @@ private:
     BtnHandlerClickCursor _clickCursor;
     BtnHandlerNudgeAction _nudgeReset;
     BtnHandlerNudgeAction _nudgeApply;
+    BtnHandlerStepSequenceReset _stepSequenceReset;
+    BtnHandlerChordsReset _chordsReset;
     BtnHandlerSaveEeprom _saveEeprom;
     PotHandlerCursorX _cursorX;
     PotHandlerCursorY _cursorY;
