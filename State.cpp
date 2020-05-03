@@ -153,11 +153,14 @@ void State::applyAllNudges()
             ptr = &_chordSel[0][getBar(i * 4) % NB_CHORD_BARS][getBeat(i * 4)];
             _nudgeBuffer[i] = *ptr;
 
+            shiftedIndex = i > _chordNudges[0]
+                ? i - _chordNudges[0]
+                : i + 32 - _chordNudges[0];
+
             // read forward as long as possible, then read from buffer
-            shiftedIndex = (i + 32 - _chordNudges[0]) % 32;
-            *ptr = i + _chordNudges[0] < 32
+            *ptr = i < _chordNudges[0]
                 ? _chordSel[0][getBar(shiftedIndex * 4) % NB_CHORD_BARS][getBeat(shiftedIndex * 4)]
-                : _nudgeBuffer[i - (32 - _chordNudges[0])];
+                : _nudgeBuffer[i - _chordNudges[0]];
 
             *ptr = (*ptr + _chordNudges[1]) % NB_CHORDS;
         }
@@ -174,11 +177,14 @@ void State::applyAllNudges()
                 ptr = &_notesSel[channel][getBar(i) % NB_NOTES_BARS][getTrig(i)];
                 _nudgeBuffer[i] = *ptr;
 
+                shiftedIndex = i > _noteNudges[channel][0]
+                    ? i - _noteNudges[channel][0]
+                    : i + 32 - _noteNudges[channel][0];
+
                 // read forward as long as possible, then read from buffer
-                shiftedIndex = (i + 32 - _noteNudges[channel][0]) % 32;
-                *ptr = i + _noteNudges[channel][0] < 32
+                *ptr = i < _noteNudges[channel][0]
                     ? _notesSel[channel][getBar(shiftedIndex) % NB_NOTES_BARS][getTrig(shiftedIndex)]
-                    : _nudgeBuffer[i - (32 - _noteNudges[channel][0])];
+                    : _nudgeBuffer[i - _noteNudges[channel][0]];
 
                 // vertical nudge: for 10010000 and nudge = 2: (00100100 | 01000000) & 11110000 = 01100000
                 *ptr = (*ptr >> _noteNudges[channel][1] | *ptr << (4 - _noteNudges[channel][1])) & B11110000;
@@ -193,11 +199,14 @@ void State::applyAllNudges()
                 ptr = &_trigs[channel][getBar(i) % NB_NOTES_BARS][getTrig(i)];
                 _nudgeBuffer[i] = *ptr;
 
+                shiftedIndex = i > _noteNudges[channel][0]
+                    ? i - _noteNudges[channel][0]
+                    : i + 32 - _noteNudges[channel][0];
+
                 // read forward as long as possible, then read from buffer
-                shiftedIndex = (i + 32 - _trigNudges[channel]) % 32;
-                *ptr = i + _trigNudges[channel] < 32
+                *ptr = i < _trigNudges[channel]
                     ? _trigs[channel][getBar(shiftedIndex) % NB_NOTES_BARS][getTrig(shiftedIndex)]
-                    : _nudgeBuffer[i - (32 - _trigNudges[channel])];
+                    : _nudgeBuffer[i - _trigNudges[channel]];
             }
         }
     }
