@@ -66,6 +66,7 @@ public:
     void handleChord(uint8_t *chord, uint8_t nbNotes, uint8_t destination);
     void resetChordInputId();
     void setStepEditAtStep(uint8_t step); // [0-31]
+    void loopSteps(uint8_t destination);
 
     void reset(bool soft);
 };

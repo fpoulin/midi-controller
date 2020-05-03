@@ -351,6 +351,52 @@ void State::handleChord(uint8_t *chord, uint8_t nbNotes, uint8_t destination)
     }
 }
 
+void State::loopSteps(uint8_t destination)
+{
+    switch(destination)
+    {
+    // chord selection
+    case 0:
+        for (uint8_t i = _stepEditAtStep; i < 32; i++)
+        {
+            _chordSel[getBar(i * 4) % NB_CHORD_BARS][getBeat(i * 4)] = _chordSel[getBar((i-_stepEditAtStep) * 4) % NB_CHORD_BARS][getBeat((i-_stepEditAtStep) * 4)];
+        }
+        break;
+
+    // ch1 notes
+    case 1:
+        for (uint8_t i = _stepEditAtStep; i < 32; i++)
+        {
+            _notesSel[0][getBar(i) % NB_NOTES_BARS][getTrig(i)] = _notesSel[0][getBar(i-_stepEditAtStep) % NB_NOTES_BARS][getTrig(i-_stepEditAtStep)];
+        }
+        break;
+
+    // ch1: trigs
+    case 2:
+        for (uint8_t i = _stepEditAtStep; i < 32; i++)
+        {
+            _trigs[0][getBar(i) % NB_NOTES_BARS][getTrig(i)] = _trigs[0][getBar(i-_stepEditAtStep) % NB_NOTES_BARS][getTrig(i-_stepEditAtStep)];
+        }
+        break;
+
+    // ch2 notes
+    case 3:
+        for (uint8_t i = _stepEditAtStep; i < 32; i++)
+        {
+            _notesSel[1][getBar(i) % NB_NOTES_BARS][getTrig(i)] = _notesSel[1][getBar(i-_stepEditAtStep) % NB_NOTES_BARS][getTrig(i-_stepEditAtStep)];
+        }
+        break;
+
+    // ch2 trigs
+    case 4:
+        for (uint8_t i = _stepEditAtStep; i < 32; i++)
+        {
+            _trigs[1][getBar(i) % NB_NOTES_BARS][getTrig(i)] = _trigs[1][getBar(i-_stepEditAtStep) % NB_NOTES_BARS][getTrig(i-_stepEditAtStep)];
+        }
+        break;
+    }
+}
+
 void State::resetChordInputId()
 {
     _currChordInputId = 0;

@@ -175,7 +175,7 @@ void Gui::switchMode(uint8_t mode)
 // callback invoked at end of splash screen animation
 void Gui::onSplashEnd()
 {
-    redrawChords();
+    redraw(false);
 }
 
 void Gui::nudge(uint8_t amount, bool horizontal)
@@ -220,6 +220,12 @@ void Gui::nudge(uint8_t amount, bool horizontal)
 void Gui::handleChordIn(uint8_t *chord, uint8_t nbNotes)
 {
     _state.handleChord(chord, nbNotes, getStateDestination());
+    redrawAtCursorY();
+}
+
+void Gui::loopSteps()
+{
+    _state.loopSteps(getStateDestination());
     redrawAtCursorY();
 }
 

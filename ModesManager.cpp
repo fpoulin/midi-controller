@@ -13,6 +13,7 @@ ModesManager::ModesManager(Gui &gui, State &state, Storage &storage, Controls &c
     , _nudgeReset(BtnHandlerNudgeAction(gui, state, *this, false))
     , _nudgeApply(BtnHandlerNudgeAction(gui, state, *this, true))
     , _stepSequenceReset(BtnHandlerStepSequenceReset(state))
+    , _loopSteps(BtnHandlerLoopSteps(gui))
     , _chordsReset(BtnHandlerChordsReset(state))
     , _saveEeprom(BtnHandlerSaveEeprom(storage, gui))
     , _cursorX(PotHandlerCursorX(gui))
@@ -68,7 +69,7 @@ void ModesManager::switchToMode(uint8_t mode)
     case 2: // step sequence
         _state.setHandleChordMode(2);
         _controls.btn2.setCallback(_stepSequenceReset);
-        _controls.btn3.setCallback(_fa);
+        _controls.btn3.setCallback(_loopSteps);
         _controls.pot1.setCallback(_cursorY);
         _controls.pot2.setCallback(_cursorX);
         _controls.pot3.setCallback(_fa);

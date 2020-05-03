@@ -9,6 +9,7 @@
 #include "BtnHandlerClickCursor.h"
 #include "BtnHandlerNudgeAction.h"
 #include "BtnHandlerStepSequenceReset.h"
+#include "BtnHandlerLoopSteps.h"
 #include "BtnHandlerChordsReset.h"
 #include "BtnHandlerSaveEeprom.h"
 #include "PotHandlerCursorX.h"
@@ -30,6 +31,7 @@ private:
     BtnHandlerNudgeAction _nudgeReset;
     BtnHandlerNudgeAction _nudgeApply;
     BtnHandlerStepSequenceReset _stepSequenceReset;
+    BtnHandlerLoopSteps _loopSteps;
     BtnHandlerChordsReset _chordsReset;
     BtnHandlerSaveEeprom _saveEeprom;
     PotHandlerCursorX _cursorX;

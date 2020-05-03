@@ -40,4 +40,5 @@ public:
 
     void nudge(uint8_t amount, bool horizontal);
     void handleChordIn(uint8_t *chord, uint8_t nbNotes);
+    void loopSteps();
 };

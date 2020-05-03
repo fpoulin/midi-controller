@@ -17,6 +17,8 @@ private:
     unsigned int _ravg_sum = 0;
     uint8_t _ravg_count = 0;
     int ravg(int x);
+    void resetRavg();
+    
 public:
     Potentiometer(uint8_t pin);
     void peek();
