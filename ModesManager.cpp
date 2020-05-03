@@ -47,6 +47,7 @@ void ModesManager::switchToMode(uint8_t mode)
     switch (_mode)
     {
     case 0: // perform
+        _gui.showCursor(false);
         _state.setHandleChordMode(0);
         _controls.btn2.setCallback(_muteChannel1);
         _controls.btn3.setCallback(_muteChannel2);
@@ -57,6 +58,7 @@ void ModesManager::switchToMode(uint8_t mode)
         break;
 
     case 1: // nudge
+        _gui.showCursor(true);
         _state.setHandleChordMode(0);
         _controls.btn2.setCallback(_nudgeReset);
         _controls.btn3.setCallback(_nudgeApply);
@@ -67,6 +69,7 @@ void ModesManager::switchToMode(uint8_t mode)
         break;
 
     case 2: // step sequence
+        _gui.showCursor(true);
         _state.setHandleChordMode(2);
         _controls.btn2.setCallback(_stepSequenceReset);
         _controls.btn3.setCallback(_loopSteps);
@@ -77,6 +80,7 @@ void ModesManager::switchToMode(uint8_t mode)
         break;
 
     case 3: // manual edit
+        _gui.showCursor(true);
         _state.setHandleChordMode(0);
         _controls.btn2.setCallback(_clickCursor);
         _controls.btn3.setCallback(_saveEeprom);
@@ -87,6 +91,7 @@ void ModesManager::switchToMode(uint8_t mode)
         break;
 
     case 4: // chords
+        _gui.showCursor(false);
         _state.setHandleChordMode(1);
         _controls.btn2.setCallback(_chordsReset);
         _controls.btn3.setCallback(_fa);
@@ -97,6 +102,7 @@ void ModesManager::switchToMode(uint8_t mode)
         break;
 
     case 5: // settings
+        _gui.showCursor(false);
         _state.setHandleChordMode(0);
         _controls.btn2.setCallback(_fa);
         _controls.btn3.setCallback(_fa);

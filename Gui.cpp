@@ -28,7 +28,7 @@ void Gui::loop()
         }
         else
         {
-            _screen.setPixel(_cursorX, _cursorY, _cursorBlinkState);
+            _screen.setPixel(_cursorX, _cursorY, _cursorBlinkState && _cursorVisible);
         }
 
         _lastRepaint = now;
@@ -111,6 +111,11 @@ void Gui::redraw(bool resetScreen)
     redrawChords();
     redrawChannel(0);
     redrawChannel(1);
+}
+
+void Gui::showCursor(bool state)
+{
+    _cursorVisible = state;
 }
 
 void Gui::moveCursorX(uint8_t n)

@@ -9,16 +9,16 @@ class Gui : private SplashCallback
 private:
     Screen _screen;
     State &_state;
-    uint8_t _trigs[8];
-    uint8_t _lastStep = 0;
+
+    bool _cursorVisible = false;
     uint8_t _cursorX = 0;
     uint8_t _cursorY = 0;
-    Splash _splash;
-    uint8_t _mode = 0;
     bool _cursorBlinkState = false;
     unsigned long _lastBlink = 0;
     unsigned long _lastRepaint = 0;
 
+    Splash _splash;
+    uint8_t _mode = 0;
     uint8_t getStateDestination(); // 0:chords, 1: ch1 notes, 2:ch1 trigs, 3: ch2 notes, 4: ch2 trigs, 42: unmapped
 
 public:
@@ -31,6 +31,7 @@ public:
     void redrawAtCursorY();
     void redraw(bool resetScreen);
     
+    void showCursor(bool state);
     void moveCursorX(uint8_t n);
     void moveCursorY(uint8_t n);
     void clickCursor();
