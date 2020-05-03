@@ -63,20 +63,20 @@ void ModesManager::switchToMode(uint8_t mode)
         _controls.pot4.setCallback(_nudgeV);
         break;
 
-    case 2: // manual edit
-        _state.setHandleChordMode(0);
-        _controls.btn2.setCallback(_clickCursor);
-        _controls.btn3.setCallback(_saveEeprom);
+    case 2: // step sequence
+        _state.setHandleChordMode(2);
+        _controls.btn2.setCallback(_stepSequenceReset);
+        _controls.btn3.setCallback(_fa);
         _controls.pot1.setCallback(_cursorY);
         _controls.pot2.setCallback(_cursorX);
         _controls.pot3.setCallback(_fa);
         _controls.pot4.setCallback(_fa);
         break;
 
-    case 3: // step sequence
-        _state.setHandleChordMode(2);
-        _controls.btn2.setCallback(_stepSequenceReset);
-        _controls.btn3.setCallback(_fa);
+    case 3: // manual edit
+        _state.setHandleChordMode(0);
+        _controls.btn2.setCallback(_clickCursor);
+        _controls.btn3.setCallback(_saveEeprom);
         _controls.pot1.setCallback(_cursorY);
         _controls.pot2.setCallback(_cursorX);
         _controls.pot3.setCallback(_fa);
