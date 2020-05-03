@@ -19,6 +19,7 @@ private:
     uint8_t _notesSel[NB_CHANNELS][NB_NOTES_BARS][NB_NOTES_PER_BAR];  // selection of notes: [channel][bar][trig*]
     uint8_t _trigs[NB_CHANNELS][NB_NOTES_BARS][NB_NOTES_PER_BAR];     // triggers: [channel][bar][trig*]
     uint8_t _transpose[NB_CHANNELS];                                  // transpose octave: [channel] (shifted by -2)
+    bool _mute[NB_CHANNELS] = {false};                                // mute channels
 
     uint8_t getTrig(uint8_t step);
     uint8_t getBeat(uint8_t step);
@@ -53,7 +54,8 @@ public:
     void setChordSelected(uint8_t step, uint8_t chordSelectionId);
     void setNoteSelected(uint8_t step, uint8_t channel, uint8_t noteSelectionId, bool state);
     void setTranspose(uint8_t channel, uint8_t octave);
-    
+    void toggleMuteChannel(uint8_t channel);
+
     void setChordNudge(uint8_t amount, bool horizontal);
     void setNotesNudge(uint8_t channel, uint8_t amount, bool horizontal);
     void setTrigNudge(uint8_t channel, uint8_t amount);

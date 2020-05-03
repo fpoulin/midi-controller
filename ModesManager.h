@@ -5,6 +5,7 @@
 #include "Controls.h"
 
 #include "FaHandler.h"
+#include "BtnHandlerMuteChannel.h"
 #include "BtnHandlerClickCursor.h"
 #include "BtnHandlerNudgeAction.h"
 #include "BtnHandlerStepSequenceReset.h"
@@ -23,6 +24,8 @@ private:
     Controls &_controls;
 
     FaHandler _fa;
+    BtnHandlerMuteChannel _muteChannel1;
+    BtnHandlerMuteChannel _muteChannel2;
     BtnHandlerClickCursor _clickCursor;
     BtnHandlerNudgeAction _nudgeReset;
     BtnHandlerNudgeAction _nudgeApply;

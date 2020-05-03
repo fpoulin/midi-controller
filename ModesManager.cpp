@@ -7,6 +7,8 @@ ModesManager::ModesManager(Gui &gui, State &state, Storage &storage, Controls &c
     , _state(state)
     , _controls(controls)
     , _fa(FaHandler())
+    , _muteChannel1(BtnHandlerMuteChannel(state, 0))
+    , _muteChannel2(BtnHandlerMuteChannel(state, 1))
     , _clickCursor(BtnHandlerClickCursor(gui))
     , _nudgeReset(BtnHandlerNudgeAction(gui, state, *this, false))
     , _nudgeApply(BtnHandlerNudgeAction(gui, state, *this, true))
@@ -45,8 +47,8 @@ void ModesManager::switchToMode(uint8_t mode)
     {
     case 0: // perform
         _state.setHandleChordMode(0);
-        _controls.btn2.setCallback(_fa);
-        _controls.btn3.setCallback(_fa);
+        _controls.btn2.setCallback(_muteChannel1);
+        _controls.btn3.setCallback(_muteChannel2);
         _controls.pot1.setCallback(_fa);
         _controls.pot2.setCallback(_transpose1);
         _controls.pot3.setCallback(_fa);

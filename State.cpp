@@ -77,7 +77,7 @@ uint8_t *State::getNotes(uint8_t step, uint8_t channel)
 
     for (uint8_t i = 0; i < NB_NOTES_PER_CHORD; i++)
     {
-        _notesToPlay[i] = isNoteSelected(step, channel, i)
+        _notesToPlay[i] = isNoteSelected(step, channel, i) && !_mute[channel]
             ? _chords[shiftedChordSel][i] + (_transpose[channel] - 2) * 12
             : 0;
     }
@@ -114,6 +114,11 @@ void State::setNoteSelected(uint8_t step, uint8_t channel, uint8_t noteSelection
 void State::setTranspose(uint8_t channel, uint8_t octave)
 {
     _transpose[channel] = octave;
+}
+
+void State::toggleMuteChannel(uint8_t channel)
+{
+    _mute[channel] = !_mute[channel];
 }
 
 void State::setChordNudge(uint8_t amount, bool horizontal)
