@@ -11,4 +11,6 @@ public:
     Storage(State &state);
     void writeState(); // use with caution
     bool restoreState();
+    void writeSettings();
+    bool restoreSettings();
 };

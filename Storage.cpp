@@ -1,17 +1,22 @@
 #include "Storage.h"
 #include <arduino.h>
 #include <EEPROM.h>
+#include "MidiIo.h"
+
+#define STORAGE_SETTINGS_SPACE_SHIFT 5
+#define STORAGE_SETTINGS_VERSION 1
 
 Storage::Storage(State &state) : _state(state)
 {
     restoreState();
+    restoreSettings();
 }
 
 void Storage::writeState()
 {
-    int idx;
+    int idx = STORAGE_SETTINGS_SPACE_SHIFT;
 
-    EEPROM.update(idx++, STORAGE_VERSION);
+    EEPROM.update(idx++, STORAGE_STATE_VERSION);
 
     // chords
     for (uint8_t i = 0; i < NB_CHORDS; i++)
@@ -53,10 +58,10 @@ void Storage::writeState()
 
 bool Storage::restoreState()
 {
-    int idx;
+    int idx = STORAGE_SETTINGS_SPACE_SHIFT;
 
     uint8_t version = EEPROM.read(idx++);
-    if (version != STORAGE_VERSION)
+    if (version != STORAGE_STATE_VERSION)
     {
         _state.reset(false);
         return false;
@@ -100,6 +105,34 @@ bool Storage::restoreState()
     {
         _state._transpose[c] = EEPROM.read(idx++);
     }
+
+    return true;
+}
+
+void Storage::writeSettings()
+{
+    int idx = 0;
+
+    EEPROM.update(idx++, STORAGE_SETTINGS_VERSION);
+    EEPROM.update(idx++, midiIo::getMidiChannelIn());
+    EEPROM.update(idx++, midiIo::getMidiChannelOut(0));
+    EEPROM.update(idx++, midiIo::getMidiChannelOut(1));
+    EEPROM.update(idx++, 0); // reserved
+}
+
+bool Storage::restoreSettings()
+{
+    int idx = 0;
+
+    uint8_t version = EEPROM.read(idx++);
+    if (version != STORAGE_SETTINGS_VERSION)
+    {
+        return false;
+    }
+
+    midiIo::setMidiChannelIn(EEPROM.read(idx++));
+    midiIo::setMidiChannelOut(0, EEPROM.read(idx++));
+    midiIo::setMidiChannelOut(1, EEPROM.read(idx++));
 
     return true;
 }

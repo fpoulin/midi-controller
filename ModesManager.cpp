@@ -15,13 +15,17 @@ ModesManager::ModesManager(Gui &gui, State &state, Storage &storage, Controls &c
     , _stepSequenceReset(BtnHandlerStepSequenceReset(state))
     , _loopSteps(BtnHandlerLoopSteps(gui))
     , _chordsReset(BtnHandlerChordsReset(state))
-    , _saveEeprom(BtnHandlerSaveEeprom(storage, gui))
+    , _saveStateEeprom(BtnHandlerSaveEeprom(storage, gui, true))
+    , _saveSettingsEeprom(BtnHandlerSaveEeprom(storage, gui, false))
     , _cursorX(PotHandlerCursorX(gui))
     , _cursorY(PotHandlerCursorY(gui))
     , _transpose1(PotHandlerTranspose(0, state))
     , _transpose2(PotHandlerTranspose(1, state))
     , _nudgeH(PotHandlerNudge(gui, 31, true))
     , _nudgeV(PotHandlerNudge(gui, 3, false))
+    , _channelIn(PotHandlerMidiChannel(gui, 255))
+    , _channelOut1(PotHandlerMidiChannel(gui, 0))
+    , _channelOut2(PotHandlerMidiChannel(gui, 1))
     {
         _controls.btn1.setCallback(*this);
         switchToMode(0);
@@ -83,7 +87,7 @@ void ModesManager::switchToMode(uint8_t mode)
         _gui.showCursor(true);
         _state.setHandleChordMode(0);
         _controls.btn2.setCallback(_clickCursor);
-        _controls.btn3.setCallback(_saveEeprom);
+        _controls.btn3.setCallback(_saveStateEeprom);
         _controls.pot1.setCallback(_cursorY);
         _controls.pot2.setCallback(_cursorX);
         _controls.pot3.setCallback(_fa);
@@ -105,10 +109,10 @@ void ModesManager::switchToMode(uint8_t mode)
         _gui.showCursor(false);
         _state.setHandleChordMode(0);
         _controls.btn2.setCallback(_fa);
-        _controls.btn3.setCallback(_fa);
-        _controls.pot1.setCallback(_fa);
-        _controls.pot2.setCallback(_fa);
-        _controls.pot3.setCallback(_fa);
+        _controls.btn3.setCallback(_saveSettingsEeprom);
+        _controls.pot1.setCallback(_channelIn);
+        _controls.pot2.setCallback(_channelOut1);
+        _controls.pot3.setCallback(_channelOut2);
         _controls.pot4.setCallback(_fa);
         break;
     }

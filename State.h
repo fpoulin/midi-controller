@@ -2,7 +2,7 @@
 
 #include <arduino.h>
 
-#define STORAGE_VERSION 2 // to be increased when changing constants below
+#define STORAGE_STATE_VERSION 3 // to be increased when changing constants below
 #define NB_CHORDS 4
 #define NB_NOTES_PER_CHORD 4
 #define NB_CHANNELS 2

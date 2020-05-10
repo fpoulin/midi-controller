@@ -37,6 +37,7 @@ public:
     void clickCursor();
 
     void switchMode(uint8_t mode);
+    void showNumber(uint8_t number); // 1 - 16
     void onSplashEnd() override;
 
     void nudge(uint8_t amount, bool horizontal);

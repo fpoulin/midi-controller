@@ -9,8 +9,9 @@ class BtnHandlerSaveEeprom : public BtnHandler
 private:
     Storage &_storage;
     Gui &_gui;
+    bool _stateOrSettings;
 
 public:
-    BtnHandlerSaveEeprom(Storage &storage, Gui &gui);
+    BtnHandlerSaveEeprom(Storage &storage, Gui &gui, bool stateOrSettings);
     void onClick() override;
 };

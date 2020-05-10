@@ -1,7 +1,7 @@
 #include <MIDI.h>
 #include "MidiIo.h"
 
-#define NB_CHANNELS 2
+#define NB_CHANNELS_OUT 2
 #define MAX_CHORD_NOTES 4
 #define MIDI_CHANNEL_IN 1
 
@@ -19,7 +19,9 @@ midi::MidiInterface<HardwareSerial> MIDI((HardwareSerial &)Serial);
 boolean _playing = false;
 uint8_t _clock = 0;
 uint8_t _step = 0;
-uint8_t _lastNotes[NB_CHANNELS][MAX_CHORD_NOTES]; // [channel][note]
+uint8_t _channelIn = MIDI_CHANNEL_IN;
+uint8_t _channelOut[NB_CHANNELS_OUT] = {1};
+uint8_t _lastNotes[NB_CHANNELS_OUT][MAX_CHORD_NOTES] = {{0}};
 
 uint8_t _nbKeyPressed = 0;
 uint8_t _nbNotesToSend = 0;
@@ -40,9 +42,14 @@ void init(
     _onChord = onChord;
     _onStop = onStop;
 
+    for (uint8_t i = 0; i < NB_CHANNELS_OUT; i++)
+    {
+        _channelOut[i] = i + 1;
+    }
+
     reset();
 
-    MIDI.begin(MIDI_CHANNEL_IN);
+    MIDI.begin(_channelIn);
     MIDI.turnThruOff();
     MIDI.setHandleClock(handleClock);
     MIDI.setHandleStart(handleStart);
@@ -51,26 +58,21 @@ void init(
     MIDI.setHandleNoteOff(handleNoteOff);
 }
 
-void sendNotes(uint8_t channel, uint8_t *notes)
+void sendNotes(uint8_t channelIdx, uint8_t *notes)
 {
     for (uint8_t i = 0; i < MAX_CHORD_NOTES; i++)
     {
-        if (_lastNotes[channel][i] != 0)
+        if (_lastNotes[channelIdx][i] != 0)
         {
-            MIDI.sendNoteOn(_lastNotes[channel][i], 0, channel + 1);
+            MIDI.sendNoteOn(_lastNotes[channelIdx][i], 0, _channelOut[channelIdx]);
         }
 
-        _lastNotes[channel][i] = notes[i];
+        _lastNotes[channelIdx][i] = notes[i];
         if (notes[i] != 0)
         {
-            MIDI.sendNoteOn(notes[i], 127, channel + 1);
+            MIDI.sendNoteOn(notes[i], 127, _channelOut[channelIdx]);
         }
     }
-}
-
-void loop()
-{
-    MIDI.read();
 }
 
 void handleClock()
@@ -92,13 +94,13 @@ void handleStop()
 {
     _onStop();
 
-    for (uint8_t channel = 0; channel < NB_CHANNELS; channel++)
+    for (uint8_t channelIdx = 0; channelIdx < NB_CHANNELS_OUT; channelIdx++)
     {
         for (uint8_t i = 0; i < MAX_CHORD_NOTES; i++)
         {
-            if (_lastNotes[channel][i] != 0)
+            if (_lastNotes[channelIdx][i] != 0)
             {
-                MIDI.sendNoteOn(_lastNotes[channel][i], 0, channel + 1);
+                MIDI.sendNoteOn(_lastNotes[channelIdx][i], 0, _channelOut[channelIdx]);
             }
         }
     }
@@ -106,14 +108,10 @@ void handleStop()
     reset();
 }
 
-void setChordYieldMinimum(uint8_t yieldSize)
-{
-    _yieldAtMinimum = min(yieldSize, MAX_CHORD_NOTES);
-}
-
 void handleNoteOn(byte channel, byte note, byte velocity)
 {
-    if(_yieldAtMinimum == 0) return;
+    if (_yieldAtMinimum == 0)
+        return;
 
     if (_nbKeyPressed < MAX_CHORD_NOTES)
     {
@@ -128,7 +126,8 @@ void handleNoteOn(byte channel, byte note, byte velocity)
 
 void handleNoteOff(byte channel, byte note, byte velocity)
 {
-    if(_yieldAtMinimum == 0) return;
+    if (_yieldAtMinimum == 0)
+        return;
 
     if (!--_nbKeyPressed && _yieldChord)
     {
@@ -136,6 +135,44 @@ void handleNoteOff(byte channel, byte note, byte velocity)
         _onChord(_chord, _nbNotesToSend);
         _nbNotesToSend = 0;
     }
+}
+
+void loop()
+{
+    MIDI.read();
+}
+
+void setChordYieldMinimum(uint8_t yieldSize)
+{
+    _yieldAtMinimum = min(yieldSize, MAX_CHORD_NOTES);
+}
+
+void setMidiChannelIn(uint8_t channel)
+{
+    _channelIn = channel;
+    MIDI.setInputChannel(_channelIn);
+}
+
+void setMidiChannelOut(uint8_t channelIdx, uint8_t channel)
+{
+    for (uint8_t i = 0; i < MAX_CHORD_NOTES; i++)
+    {
+        if (_lastNotes[channelIdx][i] != 0)
+        {
+            MIDI.sendNoteOn(_lastNotes[channelIdx][i], 0, _channelOut[channelIdx]);
+        }
+    }
+    _channelOut[channelIdx] = channel;
+}
+
+uint8_t getMidiChannelIn()
+{
+    return _channelIn;
+}
+
+uint8_t getMidiChannelOut(uint8_t channelIdx)
+{
+    return _channelOut[channelIdx];
 }
 
 void reset()
@@ -148,7 +185,7 @@ void reset()
 
     for (uint8_t i = 0; i < MAX_CHORD_NOTES; i++)
     {
-        for (uint8_t channel = 0; channel < NB_CHANNELS; channel++)
+        for (uint8_t channel = 0; channel < NB_CHANNELS_OUT; channel++)
         {
             _lastNotes[channel][i] = 0;
         }

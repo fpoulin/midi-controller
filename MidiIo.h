@@ -14,7 +14,10 @@ void init(
     void (*onStop)(void));
 
 void loop();
-
 void setChordYieldMinimum(uint8_t yieldSize);
+void setMidiChannelIn(uint8_t channel);
+void setMidiChannelOut(uint8_t channelIdx, uint8_t channel);
+uint8_t getMidiChannelIn();
+uint8_t getMidiChannelOut(uint8_t channelIdx);
 
 END_MIDI_IO_NAMESPACE

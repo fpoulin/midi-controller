@@ -16,6 +16,7 @@
 #include "PotHandlerCursorY.h"
 #include "PotHandlerTranspose.h"
 #include "PotHandlerNudge.h"
+#include "PotHandlerMidiChannel.h"
 
 class ModesManager : public BtnHandler
 {
@@ -33,13 +34,17 @@ private:
     BtnHandlerStepSequenceReset _stepSequenceReset;
     BtnHandlerLoopSteps _loopSteps;
     BtnHandlerChordsReset _chordsReset;
-    BtnHandlerSaveEeprom _saveEeprom;
+    BtnHandlerSaveEeprom _saveStateEeprom;
+    BtnHandlerSaveEeprom _saveSettingsEeprom;
     PotHandlerCursorX _cursorX;
     PotHandlerCursorY _cursorY;
     PotHandlerTranspose _transpose1;
     PotHandlerTranspose _transpose2;
     PotHandlerNudge _nudgeH;
     PotHandlerNudge _nudgeV;
+    PotHandlerMidiChannel _channelIn;
+    PotHandlerMidiChannel _channelOut1;
+    PotHandlerMidiChannel _channelOut2;
 
     uint8_t _mode;
 
