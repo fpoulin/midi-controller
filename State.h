@@ -19,6 +19,7 @@ private:
     uint8_t _notesSel[NB_CHANNELS][NB_NOTES_BARS][NB_NOTES_PER_BAR];  // selection of notes: [channel][bar][trig*]
     uint8_t _trigs[NB_CHANNELS][NB_NOTES_BARS][NB_NOTES_PER_BAR];     // triggers: [channel][bar][trig*]
     uint8_t _transpose[NB_CHANNELS];                                  // transpose octave: [channel] (shifted by -2)
+    uint8_t _trigProbability[NB_CHANNELS] = {100};                    // <100: miss some, 100: normal, >100: add some
     bool _mute[NB_CHANNELS] = {false};                                // mute channels
 
     uint8_t getTrig(uint8_t step);
@@ -45,7 +46,7 @@ private:
 public:
     State();
 
-    uint8_t hasTrigOn(uint8_t step, uint8_t channel);
+    uint8_t hasTrigOn(uint8_t step, uint8_t channel, bool skipProbability);
     bool isChordSelected(uint8_t step, uint8_t channel, uint8_t chordSelectionId);
     bool isNoteSelected(uint8_t step, uint8_t channel, uint8_t noteSelectionId);
     uint8_t *getNotes(uint8_t step, uint8_t channel);
@@ -53,6 +54,9 @@ public:
     void setTrig(uint8_t step, uint8_t channel, bool state);
     void setChordSelected(uint8_t step, uint8_t chordSelectionId);
     void setNoteSelected(uint8_t step, uint8_t channel, uint8_t noteSelectionId, bool state);
+    
+    void setSwag(uint8_t channel, uint8_t swagValue);
+    void resetAllSwags();
     void setTranspose(uint8_t channel, uint8_t octave);
     void toggleMuteChannel(uint8_t channel);
 

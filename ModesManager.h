@@ -16,6 +16,7 @@
 #include "PotHandlerCursorY.h"
 #include "PotHandlerTranspose.h"
 #include "PotHandlerNudge.h"
+#include "PotHandlerRandom.h"
 #include "PotHandlerMidiChannel.h"
 
 class ModesManager : public BtnHandler
@@ -38,6 +39,8 @@ private:
     BtnHandlerSaveEeprom _saveSettingsEeprom;
     PotHandlerCursorX _cursorX;
     PotHandlerCursorY _cursorY;
+    PotHandlerRandom _rand1;
+    PotHandlerRandom _rand2;
     PotHandlerTranspose _transpose1;
     PotHandlerTranspose _transpose2;
     PotHandlerNudge _nudgeH;

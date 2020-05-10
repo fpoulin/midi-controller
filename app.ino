@@ -41,7 +41,7 @@ void playStep(uint8_t step, void (*sendNote)(uint8_t channel, uint8_t *notes))
 
     for (uint8_t channel = 0; channel < NB_CHANNELS; channel++)
     {
-        if (_state.hasTrigOn(step, channel) != 0)
+        if (_state.hasTrigOn(step, channel, false) != 0)
         {
             sendNote(channel, _state.getNotes(step, channel));
         }

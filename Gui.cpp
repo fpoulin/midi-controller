@@ -74,7 +74,7 @@ void Gui::redrawChannel(uint8_t channel)
         }
 
         // draw note trigs
-        _screen.setPixel(step, vShift + 4, (_state.hasTrigOn(step, channel) != 0));
+        _screen.setPixel(step, vShift + 4, (_state.hasTrigOn(step, channel, true) != 0));
     }
 }
 
@@ -127,7 +127,7 @@ void Gui::moveCursorX(uint8_t n)
 
 void Gui::moveCursorY(uint8_t n)
 {
-    _cursorY = 15 - n;
+    _cursorY = n;
     redrawAtCursorY();
 }
 
@@ -152,7 +152,7 @@ void Gui::clickCursor()
 
     // channel 1 trigs
     case 2:
-        current = _state.hasTrigOn(_cursorX, 0);
+        current = _state.hasTrigOn(_cursorX, 0, true);
         _state.setTrig(_cursorX, 0, !current);
         break;
 
@@ -165,7 +165,7 @@ void Gui::clickCursor()
 
     // channel 2 trigs
     case 4:
-        current = _state.hasTrigOn(_cursorX, 1);
+        current = _state.hasTrigOn(_cursorX, 1, true);
         _state.setTrig(_cursorX, 1, !current);
         break;
     }

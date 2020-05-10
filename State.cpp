@@ -33,8 +33,14 @@ uint8_t State::getBar(uint8_t step)
     return step / 16;
 }
 
-uint8_t State::hasTrigOn(uint8_t step, uint8_t channel)
+uint8_t State::hasTrigOn(uint8_t step, uint8_t channel, bool skipProbability)
 {
+    // randombly add more trigs
+    if(!skipProbability && _trigProbability[channel] > random(100, 200))
+    {
+        return 127;
+    }
+
     uint8_t shifted = step >= _trigNudges[channel]
         ? step - _trigNudges[channel]
         : step + 32 - _trigNudges[channel];
@@ -68,6 +74,17 @@ bool State::isNoteSelected(uint8_t step, uint8_t channel, uint8_t noteSelectionI
 
 uint8_t *State::getNotes(uint8_t step, uint8_t channel)
 {
+    // randomly remove some trigs by playing empty notes (i.e. send a note off for what's playing)
+    if(_trigProbability[channel] < random(0, 100))
+    {
+        for (uint8_t i = 0; i < NB_NOTES_PER_CHORD; i++)
+        {
+            _notesToPlay[i] = 0;
+        }
+
+        return _notesToPlay;
+    }
+
     uint8_t shiftedChord = step > _chordNudges[0] * NB_CHORDS_PER_BAR
         ? step - _chordNudges[0] * NB_CHORDS_PER_BAR
         : step + 128 - _chordNudges[0] * NB_CHORDS_PER_BAR;
@@ -108,6 +125,30 @@ void State::setNoteSelected(uint8_t step, uint8_t channel, uint8_t noteSelection
     else
     {
         _notesSel[channel][getBar(step) % NB_NOTES_BARS][getTrig(step)] &= ~mask;
+    }
+}
+
+void State::setSwag(uint8_t channel, uint8_t swagValue) // 0-10
+{
+    if(swagValue < 4)
+    {
+        _trigProbability[channel] = map(swagValue, 0, 3, 5, 90);
+    }
+    else if(swagValue < 7)
+    {
+        _trigProbability[channel] = 100;
+    }
+    else
+    {
+        _trigProbability[channel] = map(swagValue, 7, 10, 110, 200);
+    }
+}
+
+void State::resetAllSwags()
+{
+    for (uint8_t i = 0; i < NB_CHANNELS; i++)
+    {
+        _trigProbability[i] = 100;
     }
 }
 

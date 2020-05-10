@@ -19,6 +19,8 @@ ModesManager::ModesManager(Gui &gui, State &state, Storage &storage, Controls &c
     , _saveSettingsEeprom(BtnHandlerSaveEeprom(storage, gui, false))
     , _cursorX(PotHandlerCursorX(gui))
     , _cursorY(PotHandlerCursorY(gui))
+    , _rand1(PotHandlerRandom(0, state))
+    , _rand2(PotHandlerRandom(1, state))
     , _transpose1(PotHandlerTranspose(0, state))
     , _transpose2(PotHandlerTranspose(1, state))
     , _nudgeH(PotHandlerNudge(gui, 31, true))
@@ -46,6 +48,7 @@ void ModesManager::switchToMode(uint8_t mode)
 {
     _mode = mode;
     _gui.switchMode(_mode);
+    _state.resetAllSwags();
     _state.resetAllNudges();
 
     switch (_mode)
@@ -55,9 +58,9 @@ void ModesManager::switchToMode(uint8_t mode)
         _state.setHandleChordMode(0);
         _controls.btn2.setCallback(_muteChannel1);
         _controls.btn3.setCallback(_muteChannel2);
-        _controls.pot1.setCallback(_fa);
+        _controls.pot1.setCallback(_rand1);
         _controls.pot2.setCallback(_transpose1);
-        _controls.pot3.setCallback(_fa);
+        _controls.pot3.setCallback(_rand2);
         _controls.pot4.setCallback(_transpose2);
         break;
 
