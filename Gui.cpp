@@ -7,7 +7,7 @@
 Gui::Gui(State &state) : _state(state), _screen(Screen()), _splash(Splash(_screen))
 {
     redraw(true);
-    _splash.play(_mode, *this);
+    _splash.playPicto(_mode, *this);
 }
 
 void Gui::loop()
@@ -174,12 +174,12 @@ void Gui::clickCursor()
 void Gui::switchMode(uint8_t mode)
 {
     _mode = mode;
-    _splash.play(mode, *this);
+    _splash.playPicto(mode, *this);
 }
 
 void Gui::showNumber(uint8_t number)
 {
-    // splash a number shortly, somehow
+    _splash.showNumber(number, *this);
 }
 
 // callback invoked at end of splash screen animation
